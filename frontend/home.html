@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Controle de Acesso</title>
+  <style>
+    :root{font-family:Arial,Helvetica,sans-serif;color:#fff;background:#3d4659}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#3d4659}.top{height:174px;position:relative;display:flex;align-items:flex-start;justify-content:center;padding-top:61px;background:#3d4659;box-shadow:0 7px 13px rgba(20,25,35,.22)}.logo{position:absolute;left:4px;top:12px;width:246px;height:58px;object-fit:cover;object-position:left center}.title-area{text-align:center}.title-area h1{font-family:Georgia,serif;font-size:46px;line-height:1;margin:0 0 9px;font-weight:700}.toolbar{display:flex;justify-content:center;gap:10px}.toolbar a{background:#08aaa8;color:white;text-decoration:none;padding:10px 16px;border-radius:6px;font-weight:700;font-size:14px}.toolbar input{width:200px;background:#4c566b;color:#fff;border:1px solid #68738a;border-radius:6px;padding:10px 13px;font-style:italic}.toolbar input::placeholder{color:#c4cad5}.logout{position:absolute;right:5px;top:10px;background:#e63b31;color:#fff;border:0;border-radius:11px;padding:12px 20px;font-weight:700;box-shadow:0 5px 10px rgba(0,0,0,.18)}table{width:100%;border-collapse:collapse;table-layout:fixed}thead{height:66px}th{text-align:left;padding:0 4px;font-size:15px}th:nth-child(1){width:36%}th:nth-child(2){width:11%}th:nth-child(3){width:10%}th:nth-child(4){width:13%}th:nth-child(5){width:12%}th:nth-child(6){width:18%;text-align:center}td{height:59px;padding:8px 4px;border-bottom:1px solid #4b5569;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}td:nth-child(2),td:nth-child(3),td:nth-child(4),td:nth-child(5){text-align:center}.actions{text-align:center;overflow:visible}.actions button{border:0;border-radius:5px;color:#fff;padding:7px 13px;margin:2px;cursor:pointer;font-size:14px}.entry{background:#17b13e}.exit{background:#ef243d}.profile{background:#5f8fc4}.empty{text-align:center;height:180px;color:#cbd1db}.modal{display:none;position:fixed;inset:0;background:rgba(8,12,20,.72);align-items:center;justify-content:center;padding:20px;z-index:10}.modal.open{display:flex}.dialog{width:min(520px,100%);background:#434d61;border:1px solid #657087;border-radius:13px;padding:25px;box-shadow:0 25px 70px rgba(0,0,0,.45)}.dialog h2{margin-top:0}.details{display:grid;grid-template-columns:1fr 1fr;gap:13px}.details div{background:#364053;padding:12px;border-radius:8px}.details small{display:block;color:#bfc7d5;margin-bottom:5px}.dialog-actions{display:flex;justify-content:flex-end;margin-top:20px}.close{background:#65738c;color:#fff;border:0;border-radius:6px;padding:9px 15px}.feedback{position:fixed;right:18px;bottom:18px;background:#1e9b50;padding:13px 18px;border-radius:8px;box-shadow:0 8px 25px rgba(0,0,0,.25);display:none}@media(max-width:900px){.logo{width:190px}.top{height:210px;padding-top:85px}.title-area h1{font-size:38px}table{min-width:950px}.table-wrap{overflow:auto}.logout{right:10px}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="title-area">
+      <h1>Controle de Acesso</h1>
+      <div class="toolbar">
+        <a href="/cadastro.html">Cadastro</a>
+        <a href="/registro.html">Registros</a>
+        <input id="search" placeholder="Pesquisar por nome ou CPF">
+      </div>
+    </div>
+    <button class="logout" id="logout">Sair</button>
+  </header>
+  <main class="table-wrap">
+    <table>
+      <thead><tr><th>Nome</th><th>CPF</th><th>Tipo</th><th>Agendamentos</th><th>Responsável</th><th>Ações</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </main>
+  <div class="modal" id="profileModal">
+    <section class="dialog">
+      <h2>Perfil</h2>
+      <div class="details" id="profileDetails"></div>
+      <div class="dialog-actions"><button class="close" data-close>Fechar</button></div>
+    </section>
+  </div>
+  <div class="modal" id="vehicleModal">
+    <section class="dialog">
+      <h2>Confirmar entrada</h2>
+      <p id="vehicleQuestion"></p>
+      <div class="details" id="vehicleDetails"></div>
+      <div class="dialog-actions"><button class="close" data-close>Cancelar</button><button class="entry" id="confirmEntry" style="border:0;border-radius:6px;padding:9px 15px;color:#fff;margin-left:8px">Confirmar entrada</button></div>
+    </section>
+  </div>
+  <div class="feedback" id="feedback"></div>
+  <script src="/config.js"></script>
+  <script>
+    const api = window.API_BASE || '';
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+    const rows = document.getElementById('rows');
+    const feedback = document.getElementById('feedback');
+    let users = [];
+    let schedules = [];
+    let selectedUser = null;
+    if (!token) location.href = '/login.html';
+    const clean = value => String(value ?? '').replace(/[&<>"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[char]);
+    const normalizeDate = value => value ? String(value).slice(0,10).split('-').reverse().join('/') : '—';
+    function render(filter = '') {
+      const term = filter.trim().toLowerCase();
+      const allowed = users.filter(user => ['visitante','fornecedor'].includes(String(user.tipo).toLowerCase()) && user.ativo !== false && `${user.nome} ${user.cpf}`.toLowerCase().includes(term));
+      rows.innerHTML = allowed.length ? allowed.map(user => {
+        const schedule = schedules.find(item => Number(item.usuario_id) === Number(user.id));
+        return `<tr><td>${clean(user.nome).toUpperCase()}</td><td>${clean(user.cpf)}</td><td>${clean(user.tipo)}</td><td>${normalizeDate(schedule?.data_agendada)}</td><td>${clean(schedule?.responsavel_nome || '—')}</td><td class="actions"><button class="entry" data-action="entry" data-id="${user.id}">Entrada</button><button class="exit" data-action="exit" data-id="${user.id}">Saída</button><button class="profile" data-action="profile" data-id="${user.id}">Ver Perfil</button></td></tr>`;
+      }).join('') : '<tr><td class="empty" colspan="6">Nenhuma pessoa encontrada.</td></tr>';
+    }
+    async function load() {
+      const responses = await Promise.all([fetch(`${api}/usuarios`,{headers}),fetch(`${api}/agendamentos`,{headers})]);
+      users = await responses[0].json();
+      schedules = await responses[1].json();
+      render(document.getElementById('search').value);
+    }
+    function showFeedback(message) {
+      feedback.textContent = message;
+      feedback.style.display = 'block';
+      setTimeout(() => feedback.style.display = 'none', 2600);
+    }
+    function openProfile(user) {
+      const vehicle = user.possui_carro ? `${user.modelo || '—'} · ${user.placa || '—'} · ${user.cor || '—'}` : 'Sem veículo';
+      document.getElementById('profileDetails').innerHTML = `<div><small>Nome</small>${clean(user.nome)}</div><div><small>CPF</small>${clean(user.cpf)}</div><div><small>Tipo</small>${clean(user.tipo)}</div><div><small>E-mail</small>${clean(user.email)}</div><div><small>Empresa</small>${clean(user.empresa || '—')}</div><div><small>Veículo</small>${clean(vehicle)}</div>`;
+      document.getElementById('profileModal').classList.add('open');
+    }
+    async function lastRecord(userId) {
+      const response = await fetch(`${api}/registros?usuario_id=${userId}`,{headers});
+      const records = await response.json();
+      return records[0] || null;
+    }
+    async function register(user, action) {
+      const last = await lastRecord(user.id);
+      if (action === 'entrada' && last?.acao === 'entrada') return alert('Já existe uma entrada em aberto para esta pessoa.');
+      if (action === 'saida' && last?.acao !== 'entrada') return alert('Não há entrada em aberto para registrar a saída.');
+      const response = await fetch(`${api}/registros`,{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({usuario_id:user.id,acao:action})});
+      const result = await response.json();
+      if (!response.ok) return alert(result.error || 'Não foi possível registrar.');
+      showFeedback(`${action === 'entrada' ? 'Entrada' : 'Saída'} registrada para ${user.nome}.`);
+    }
+    rows.onclick = async event => {
+      const button = event.target.closest('button[data-action]');
+      if (!button) return;
+      const user = users.find(item => Number(item.id) === Number(button.dataset.id));
+      if (button.dataset.action === 'profile') return openProfile(user);
+      if (button.dataset.action === 'exit') return register(user,'saida');
+      selectedUser = user;
+      document.getElementById('vehicleQuestion').textContent = `Registrar entrada de ${user.nome}?`;
+      document.getElementById('vehicleDetails').innerHTML = user.possui_carro ? `<div><small>Placa</small>${clean(user.placa || '—')}</div><div><small>Modelo</small>${clean(user.modelo || '—')}</div><div><small>Cor</small>${clean(user.cor || '—')}</div>` : '<div><small>Veículo</small>Entrada sem veículo</div>';
+      document.getElementById('vehicleModal').classList.add('open');
+    };
+    document.getElementById('confirmEntry').onclick = async () => { document.getElementById('vehicleModal').classList.remove('open'); await register(selectedUser,'entrada'); };
+    document.querySelectorAll('[data-close]').forEach(button => button.onclick = () => button.closest('.modal').classList.remove('open'));
+    document.querySelectorAll('.modal').forEach(modal => modal.onclick = event => { if (event.target === modal) modal.classList.remove('open'); });
+    document.getElementById('search').oninput = event => render(event.target.value);
+    document.getElementById('logout').onclick = () => { localStorage.clear(); location.href='/login.html'; };
+    load().catch(() => rows.innerHTML='<tr><td class="empty" colspan="6">Não foi possível carregar os dados locais.</td></tr>');
+  </script>
+</body>
+</html>
