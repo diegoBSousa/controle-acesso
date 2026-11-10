@@ -1,0 +1,11 @@
+$ curl -s -i -X POST http://localhost:3000/registros -H 'Authorization: Bearer $TOKEN_PORTARIA' -H 'Content-Type: application/json' -d '{"usuario_id":6,"acao":"entrada"}'
+HTTP/1.1 201 Created
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 210
+ETag: W/"d2-VX4mTtDAOWz1/DfW00J7IVu8J7c"
+Date: Mon, 09 Nov 2026 20:14:11 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":1,"usuario_id":6,"nome":"Colaborador A (teste)","cpf":"111.111.111-11","tipo":"colaborador","acao":"entrada","data_hora":"2026-11-09T20:14:11.803Z","registrado_por":2,"registrado_por_nome":"Nathan Souza"}

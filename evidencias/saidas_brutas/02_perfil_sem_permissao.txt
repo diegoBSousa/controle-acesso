@@ -1,0 +1,11 @@
+$ curl -s -i -X POST http://localhost:3000/usuarios -H 'Authorization: Bearer $TOKEN_COLAB_A' -H 'Content-Type: application/json' -d '{"nome":"Novo","cpf":"333.333.333-33","email":"novo@teste.local"}'
+HTTP/1.1 403 Forbidden
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 56
+ETag: W/"38-rRfU9oKjoQ7rjVdPmARKe/vu+Lo"
+Date: Mon, 09 Nov 2026 20:14:11 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Usuário sem permissão para esta operação"}

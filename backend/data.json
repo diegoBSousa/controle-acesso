@@ -64,5 +64,38 @@
   ],
   "registros": [],
   "agendamentos": [],
-  "auditoria": []
+  "auditoria": [
+    {
+      "id": 2,
+      "ator_id": 1,
+      "ator_nome": "Gabrieli Botam",
+      "ator_tipo": "admin",
+      "acao": "LOGIN",
+      "alvo_id": 1,
+      "alvo_nome": "Gabrieli Botam",
+      "alvo_tipo": "admin",
+      "detalhes": null,
+      "ip_origem": "127.0.0.1",
+      "quando": "2026-11-10T09:54:05.189Z",
+      "hash_anterior": "2beab8728ce840b1138abf6de3aff903ae6b07344eef21e7bfe3bde13722f9d4",
+      "hash": "08d1017b3c62b1df605501853d1bd038dca13f8526e19d41aec3d3bd79a003d3"
+    },
+    {
+      "id": 1,
+      "ator_id": null,
+      "ator_nome": null,
+      "ator_tipo": null,
+      "acao": "FALHA_LOGIN",
+      "alvo_id": 1,
+      "alvo_nome": "Gabrieli Botam",
+      "alvo_tipo": "admin",
+      "detalhes": "Tentativa com login \"admin\"",
+      "ip_origem": "127.0.0.1",
+      "quando": "2026-11-10T09:53:57.306Z",
+      "hash_anterior": null,
+      "hash": "2beab8728ce840b1138abf6de3aff903ae6b07344eef21e7bfe3bde13722f9d4"
+    }
+  ],
+  "usuarios_excluidos": [],
+  "agendamentos_cancelados": []
 }

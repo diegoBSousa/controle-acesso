@@ -1,0 +1,3 @@
+$ curl -s http://localhost:3000/usuarios -H 'Authorization: Bearer $TOKEN_PORTARIA' | python3 -c "import sys,json;print(len(json.load(sys.stdin)),'usuarios visiveis para a portaria')"
+7 usuarios visiveis para a portaria
+
