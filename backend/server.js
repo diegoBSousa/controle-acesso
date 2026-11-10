@@ -192,8 +192,13 @@ function clientIp(req) {
 function audit(req, acao, alvo, detalhes, actorOverride = null) {
   const actor = actorOverride || req.user || req.actor || currentUser(req);
   // Sem ator identificado só registramos falhas de autenticação (ator desconhecido).
+<<<<<<< HEAD
   if (!actor && !['FALHA_LOGIN', 'LOGIN_BLOQUEADO'].includes(acao)) return;
   const evento = {
+=======
+  if (!actor && acao !== 'FALHA_LOGIN') return;
+  data.auditoria.unshift({
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
     id: nextId(data.auditoria),
     ator_id: actor ? actor.id : null,
     ator_nome: actor ? actor.nome : null,
@@ -204,11 +209,16 @@ function audit(req, acao, alvo, detalhes, actorOverride = null) {
     alvo_tipo: alvo?.tipo || null,
     detalhes: detalhes || null,
     ip_origem: clientIp(req),
+<<<<<<< HEAD
     quando: new Date().toISOString(),
     hash_anterior: data.auditoria[0]?.hash ?? null
   };
   evento.hash = auditDigest(evento);
   data.auditoria.unshift(evento);
+=======
+    quando: new Date().toISOString()
+  });
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
 }
 
 function normalizeAction(value) {
@@ -253,7 +263,10 @@ app.post('/login', (req, res) => {
   }
 
   if (!user || user.ativo === false || !user.senha_hash || !verifyPassword(password, user.senha_hash)) {
+<<<<<<< HEAD
     loginFails.set(chave, [...(loginFails.get(chave) || []), Date.now()]);
+=======
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
     audit(req, 'FALHA_LOGIN', user ? { id: user.id, nome: user.nome, tipo: user.tipo } : null,
       `Tentativa com login "${login.slice(0, 60)}"`);
     saveData();
@@ -262,7 +275,11 @@ app.post('/login', (req, res) => {
 
   loginFails.delete(chave);
   const token = crypto.randomBytes(32).toString('hex');
+<<<<<<< HEAD
   sessions.set(token, { userId: user.id, expiraEm: Date.now() + SESSION_TTL_MS });
+=======
+  sessions.set(token, user.id);
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
   audit(req, 'LOGIN', user, null, user);
   saveData();
 
