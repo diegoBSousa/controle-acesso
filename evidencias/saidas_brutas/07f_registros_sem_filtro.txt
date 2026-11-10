@@ -1,0 +1,3 @@
+$ curl -s http://localhost:3000/registros -H 'Authorization: Bearer $TOKEN_COLAB_A' | python3 -c "import sys,json;r=json.load(sys.stdin);print(len(r),'registro(s); usuario_id:',sorted({x['usuario_id'] for x in r}))"
+1 registro(s); usuario_id: [6]
+

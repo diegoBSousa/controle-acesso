@@ -1,0 +1,11 @@
+$ curl -s -i -X POST http://localhost:3000/agendar -H 'Authorization: Bearer $TOKEN_COLAB_A' -H 'Content-Type: application/json' -d '{"usuario_id":5,"data_agendada":"2026-11-11","hora_agendada":"10:00","destino":"Entrega","responsavel_id":1,"responsavel_nome":"FORJADO"}'
+HTTP/1.1 201 Created
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 241
+ETag: W/"f1-lLeBrQ/rcWQ286jfBIq9ISkhvF0"
+Date: Mon, 09 Nov 2026 20:14:11 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"success":true,"message":"Agendamento criado com sucesso","id":2,"usuario_id":5,"nome":"Matheus Beraldo","responsavel_id":6,"responsavel_nome":"Colaborador A (teste)","data_agendada":"2026-11-11","hora_agendada":"10:00","destino":"Entrega"}

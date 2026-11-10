@@ -1,0 +1,3 @@
+$ curl -s 'http://localhost:3000/auditoria?limit=1' -H 'Authorization: Bearer $TOKEN_ADMIN' | python3 -c "import sys,json;print(sorted(json.load(sys.stdin)[0].keys()))"
+['acao', 'alvo_id', 'alvo_nome', 'alvo_tipo', 'ator_id', 'ator_nome', 'ator_tipo', 'detalhes', 'id', 'ip_origem', 'quando']
+

@@ -1,0 +1,11 @@
+$ curl -s -i http://localhost:3000/usuarios/6 -H 'Authorization: Bearer $TOKEN_COLAB_A'
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 265
+ETag: W/"109-/rx0gqZxFRFpT5RAn7SlaT99SOM"
+Date: Mon, 09 Nov 2026 20:14:12 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"nome":"Colaborador A (teste)","cpf":"111.111.111-11","email":"colab.a@teste.local","usuario":"colab_a","tipo":"colaborador","setor":"TI","empresa":null,"ativo":true,"possui_carro":false,"placa":null,"modelo":null,"cor":null,"id":6,"foto_base64":null,"carro":null}

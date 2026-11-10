@@ -1,0 +1,11 @@
+$ curl -s -i -X POST http://localhost:3000/usuarios -H 'Authorization: Bearer $TOKEN_PORTARIA' -H 'Content-Type: application/json' -d '{"nome":"X","cpf":"999.999.999-99","email":"x@t.local","usuario":"x","tipo":"admin","senha":"x"}'
+HTTP/1.1 403 Forbidden
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 65
+ETag: W/"41-FBTiANmpPJxhJe45757BH+qLpwo"
+Date: Mon, 09 Nov 2026 20:14:12 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Sem permissão para gerenciar este perfil de usuário"}

@@ -1,0 +1,5 @@
+$ curl -s http://localhost:3000/usuarios -H 'Authorization: Bearer $TOKEN_COLAB_A' | python3 -c "import sys,json;[print(u['id'],u['nome'],u['tipo'],'cpf' in u and u['cpf'] or '(sem CPF)',sep=' | ') for u in json.load(sys.stdin)]"
+6 | Colaborador A (teste) | colaborador | 111.111.111-11
+4 | Jaiane Americo | visitante | (sem CPF)
+5 | Matheus Beraldo | fornecedor | (sem CPF)
+

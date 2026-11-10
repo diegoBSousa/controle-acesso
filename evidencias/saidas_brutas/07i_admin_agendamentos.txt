@@ -1,0 +1,3 @@
+$ curl -s http://localhost:3000/agendamentos -H 'Authorization: Bearer $TOKEN_ADMIN' | python3 -c "import sys,json;print(len(json.load(sys.stdin)),'agendamentos visiveis para o admin')"
+2 agendamentos visiveis para o admin
+

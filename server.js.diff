@@ -1,0 +1,211 @@
+--- server.original.js	2026-11-09 17:13:45.250682476 -0300
++++ proj/Controle-acesso-final/backend/server.js	2026-11-09 17:13:45.283300467 -0300
+@@ -92,25 +92,62 @@
+   return (req, res, next) => {
+     if (!req.user) return res.status(401).json({ error: 'Não autenticado' });
+     if (!allowed.has(String(req.user.tipo).toLowerCase())) {
++      audit(req, 'ACESSO_NEGADO', null, `${req.method} ${req.path}`);
++      saveData();
+       return res.status(403).json({ error: 'Usuário sem permissão para esta operação' });
+     }
+     next();
+   };
+ }
+ 
+-function audit(req, acao, alvo, detalhes) {
+-  const actor = req.user || req.actor || currentUser(req);
+-  if (!actor) return;
++// Perfis com visão operacional completa (Tabela 2). Os demais enxergam apenas os próprios dados.
++const PRIVILEGED_ROLES = new Set(['admin', 'rh', 'portaria']);
++const roleOf = user => String(user?.tipo || '').toLowerCase();
++const isPrivileged = user => PRIVILEGED_ROLES.has(roleOf(user));
++const isSelf = (user, id) => Number(id) === user.id;
++
++// Autorização por objeto (anti-BOLA): nega e audita o acesso a dados de outra pessoa.
++function denyOtherUser(req, res, alvoId) {
++  const alvo = data.usuarios.find(item => item.id === Number(alvoId));
++  audit(req, 'ACESSO_NEGADO', alvo || null, `${req.method} ${req.originalUrl} (dados de outro usuário)`);
++  saveData();
++  return res.status(403).json({ error: 'Sem permissão para acessar dados de outro usuário' });
++}
++
++// Quem pode criar/alterar/excluir contas de cada perfil (anti-escalada de privilégio).
++function canManageType(actor, tipo) {
++  const role = roleOf(actor);
++  const target = String(tipo || '').toLowerCase();
++  if (role === 'admin') return true;
++  if (role === 'rh') return target !== 'admin';
++  if (role === 'portaria') return ['visitante', 'fornecedor'].includes(target);
++  return false;
++}
++function denyManage(req, res, alvo) {
++  audit(req, 'ACESSO_NEGADO', alvo || null, `${req.method} ${req.originalUrl} (gestão de perfil não permitida)`);
++  saveData();
++  return res.status(403).json({ error: 'Sem permissão para gerenciar este perfil de usuário' });
++}
++
++function clientIp(req) {
++  return String(req.ip || req.socket?.remoteAddress || '').replace(/^::ffff:/, '') || null;
++}
++
++function audit(req, acao, alvo, detalhes, actorOverride = null) {
++  const actor = actorOverride || req.user || req.actor || currentUser(req);
++  // Sem ator identificado só registramos falhas de autenticação (ator desconhecido).
++  if (!actor && acao !== 'FALHA_LOGIN') return;
+   data.auditoria.unshift({
+     id: nextId(data.auditoria),
+-    ator_id: actor.id,
+-    ator_nome: actor.nome,
+-    ator_tipo: actor.tipo,
++    ator_id: actor ? actor.id : null,
++    ator_nome: actor ? actor.nome : null,
++    ator_tipo: actor ? actor.tipo : null,
+     acao,
+     alvo_id: alvo?.id || null,
+     alvo_nome: alvo?.nome || null,
+     alvo_tipo: alvo?.tipo || null,
+     detalhes: detalhes || null,
++    ip_origem: clientIp(req),
+     quando: new Date().toISOString()
+   });
+ }
+@@ -132,12 +169,15 @@
+   );
+ 
+   if (!user || user.ativo === false || !user.senha_hash || !verifyPassword(password, user.senha_hash)) {
++    audit(req, 'FALHA_LOGIN', user ? { id: user.id, nome: user.nome, tipo: user.tipo } : null,
++      `Tentativa com login "${login.slice(0, 60)}"`);
++    saveData();
+     return res.status(401).json({ error: 'Usuário ou senha inválidos' });
+   }
+ 
+   const token = crypto.randomBytes(32).toString('hex');
+   sessions.set(token, user.id);
+-  audit({ actor: user }, 'LOGIN', user);
++  audit(req, 'LOGIN', user, null, user);
+   saveData();
+ 
+   res.json({ token, usuario: publicUser(user) });
+@@ -154,10 +194,20 @@
+ app.get('/me', requireAuth, (req, res) => res.json(publicUser(req.user)));
+ 
+ app.get('/usuarios', requireAuth, (req, res) => {
+-  res.json(data.usuarios.map(publicUser));
++  if (isPrivileged(req.user)) return res.json(data.usuarios.map(publicUser));
++
++  // Demais perfis: apenas o próprio cadastro. O colaborador também recebe a lista mínima
++  // (id, nome, tipo) de visitantes e fornecedores, necessária para criar agendamentos.
++  const lista = [publicUser(req.user)];
++  if (roleOf(req.user) === 'colaborador') {
++    data.usuarios
++      .filter(item => ['visitante', 'fornecedor'].includes(roleOf(item)) && item.ativo !== false)
++      .forEach(item => lista.push({ id: item.id, nome: item.nome, tipo: item.tipo, ativo: item.ativo }));
++  }
++  res.json(lista);
+ });
+ 
+-app.get('/usuarios-agendados-hoje', requireAuth, (req, res) => {
++app.get('/usuarios-agendados-hoje', requireAuth, requireRole('admin', 'rh', 'portaria'), (req, res) => {
+   const today = new Date().toISOString().slice(0, 10);
+   res.json(data.agendamentos
+     .filter(item => item.data_agendada === today)
+@@ -165,6 +215,7 @@
+ });
+ 
+ app.get('/usuarios/:id', requireAuth, (req, res) => {
++  if (!isPrivileged(req.user) && !isSelf(req.user, req.params.id)) return denyOtherUser(req, res, req.params.id);
+   const user = data.usuarios.find(item => item.id === Number(req.params.id));
+   if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+   res.json(publicUser(user));
+@@ -209,6 +260,7 @@
+   }
+ 
+   const tipo = String(req.body.tipo || 'visitante').toLowerCase();
++  if (!canManageType(req.user, tipo)) return denyManage(req, res, { nome: req.body.nome, tipo });
+   if (INTERNAL_ROLES.has(tipo) && !req.body.senha) {
+     return res.status(400).json({ error: 'Senha obrigatória para usuários internos' });
+   }
+@@ -229,6 +281,8 @@
+   if (index < 0) return res.status(404).json({ error: 'Usuário não encontrado' });
+ 
+   const existing = data.usuarios[index];
++  const novoTipo = String(req.body.tipo ?? existing.tipo).toLowerCase();
++  if (!canManageType(req.user, existing.tipo) || !canManageType(req.user, novoTipo)) return denyManage(req, res, existing);
+   const user = userFromBody(req.body, existing);
+ 
+   if (!req.body.senha && req.body.manterSenha !== 'true') {
+@@ -254,6 +308,7 @@
+ app.put('/usuarios/:id/toggle-ativo', requireAuth, requireRole('admin', 'rh'), (req, res) => {
+   const user = data.usuarios.find(item => item.id === Number(req.params.id));
+   if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
++  if (!canManageType(req.user, user.tipo)) return denyManage(req, res, user);
+   user.ativo = !user.ativo;
+   audit(req, user.ativo ? 'ATIVACAO_USUARIO' : 'DESATIVACAO_USUARIO', user);
+   saveData();
+@@ -264,6 +319,7 @@
+   const id = Number(req.params.id);
+   const user = data.usuarios.find(item => item.id === id);
+   if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
++  if (!canManageType(req.user, user.tipo)) return denyManage(req, res, user);
+ 
+   // O histórico não é apagado: mantém rastreabilidade dos eventos anteriores.
+   data.usuarios = data.usuarios.filter(item => item.id !== id);
+@@ -273,6 +329,7 @@
+ });
+ 
+ app.get(['/carro/:usuarioId', '/veiculo/:usuarioId'], requireAuth, (req, res) => {
++  if (!isPrivileged(req.user) && !isSelf(req.user, req.params.usuarioId)) return denyOtherUser(req, res, req.params.usuarioId);
+   const user = data.usuarios.find(item => item.id === Number(req.params.usuarioId));
+   if (!user?.possui_carro) return res.status(404).json({ message: 'Veículo não encontrado', possui_carro: false });
+   res.json({ placa: user.placa, modelo: user.modelo, cor: user.cor, possui_carro: true });
+@@ -312,17 +369,24 @@
+   res.status(201).json(record);
+ });
+ 
+-app.get('/registros/ultimo', requireAuth, (req, res) =>
+-  res.json(data.registros.find(item => item.usuario_id === Number(req.query.usuario_id)) || null)
+-);
++app.get('/registros/ultimo', requireAuth, (req, res) => {
++  if (!isPrivileged(req.user) && !isSelf(req.user, req.query.usuario_id)) return denyOtherUser(req, res, req.query.usuario_id);
++  res.json(data.registros.find(item => item.usuario_id === Number(req.query.usuario_id)) || null);
++});
+ 
+ app.get('/registros/abertos', requireAuth, (req, res) => {
++  if (!isPrivileged(req.user) && !isSelf(req.user, req.query.usuario_id)) return denyOtherUser(req, res, req.query.usuario_id);
+   const records = data.registros.filter(item => item.usuario_id === Number(req.query.usuario_id));
+   res.json(records[0]?.acao === 'entrada' && !records[0]?.cancelado ? [records[0]] : []);
+ });
+ 
+ app.get('/registros', requireAuth, (req, res) => {
+   let result = [...data.registros];
++  if (!isPrivileged(req.user)) {
++    // Sem permissão operacional: só o próprio histórico, mesmo que outro usuario_id seja informado.
++    if (req.query.usuario_id && !isSelf(req.user, req.query.usuario_id)) return denyOtherUser(req, res, req.query.usuario_id);
++    result = result.filter(item => item.usuario_id === req.user.id);
++  }
+   if (req.query.usuario_id) result = result.filter(item => item.usuario_id === Number(req.query.usuario_id));
+   if (req.query.limit) result = result.slice(0, Math.min(Number(req.query.limit), 1000));
+   res.json(result);
+@@ -333,7 +397,7 @@
+   res.status(405).json({ error: 'Registros de acesso são imutáveis para preservar a rastreabilidade' })
+ );
+ 
+-app.post('/agendar', requireAuth, (req, res) => {
++app.post('/agendar', requireAuth, requireRole('admin', 'rh', 'colaborador'), (req, res) => {
+   const user = data.usuarios.find(item => item.id === Number(req.body.usuario_id));
+   if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+   if (!['visitante', 'fornecedor'].includes(String(user.tipo).toLowerCase())) {
+@@ -360,7 +424,12 @@
+   res.status(201).json({ success: true, message: 'Agendamento criado com sucesso', ...appointment });
+ });
+ 
+-app.get('/agendamentos', requireAuth, (_req, res) => res.json(data.agendamentos));
++app.get('/agendamentos', requireAuth, (req, res) => {
++  if (isPrivileged(req.user)) return res.json(data.agendamentos);
++  // Colaborador: agendamentos pelos quais é responsável; visitante/fornecedor: os próprios.
++  res.json(data.agendamentos.filter(item =>
++    item.usuario_id === req.user.id || item.responsavel_id === req.user.id));
++});
+ 
+ app.delete('/agendamentos/:id', requireAuth, (req, res) => {
+   const index = data.agendamentos.findIndex(item => item.id === Number(req.params.id));
