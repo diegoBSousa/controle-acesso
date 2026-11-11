@@ -1,0 +1,11 @@
+$ curl -s -i -X PATCH http://localhost:3000/auditoria/1 -H 'Authorization: Bearer $TOKEN_ADMIN' -H 'Content-Type: application/json' -d '{"acao":"ADULTERADO"}'
+HTTP/1.1 404 Not Found
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 32
+ETag: W/"20-lqMP793B2qh+2ehS8/rb5p5RKXg"
+Date: Mon, 09 Nov 2026 20:14:11 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Rota não encontrada"}

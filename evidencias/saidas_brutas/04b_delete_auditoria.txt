@@ -1,0 +1,11 @@
+$ curl -s -i -X DELETE http://localhost:3000/auditoria -H 'Authorization: Bearer $TOKEN_ADMIN'
+HTTP/1.1 405 Method Not Allowed
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 48
+ETag: W/"30-PFF3SLvei8+/lI/6+c/Ug0cbE2g"
+Date: Mon, 09 Nov 2026 20:14:11 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Eventos de auditoria são imutáveis"}

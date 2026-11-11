@@ -1,0 +1,11 @@
+$ curl -s -i -X DELETE http://localhost:3000/registros/1 -H 'Authorization: Bearer $TOKEN_ADMIN'
+HTTP/1.1 405 Method Not Allowed
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 80
+ETag: W/"50-CHIIa6QjYar0Hd93ag1luKFwEh0"
+Date: Mon, 09 Nov 2026 20:14:11 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Registros de acesso são imutáveis para preservar a rastreabilidade"}

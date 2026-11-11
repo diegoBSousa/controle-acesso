@@ -1,0 +1,11 @@
+$ curl -s -i -X PUT http://localhost:3000/usuarios/1 -H 'Authorization: Bearer $TOKEN_RH' -H 'Content-Type: application/json' -d '{"senha":"tomada"}'
+HTTP/1.1 403 Forbidden
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 65
+ETag: W/"41-FBTiANmpPJxhJe45757BH+qLpwo"
+Date: Mon, 09 Nov 2026 20:14:12 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Sem permissão para gerenciar este perfil de usuário"}

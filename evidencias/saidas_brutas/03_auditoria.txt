@@ -1,0 +1,10 @@
+$ curl -s 'http://localhost:3000/auditoria?limit=8' -H 'Authorization: Bearer $TOKEN_ADMIN' | python3 -c "import sys,json;[print(e['id'],e['quando'],e['ator_nome'] or '(desconhecido)',e['acao'],e['alvo_nome'] or '-',e['ip_origem'],sep=' | ') for e in json.load(sys.stdin)]"
+18 | 2026-11-09T20:14:12.121Z | (desconhecido) | FALHA_LOGIN | Gabrieli Botam | 127.0.0.1
+17 | 2026-11-09T20:14:12.076Z | Nathan Souza | ACESSO_NEGADO | - | 127.0.0.1
+16 | 2026-11-09T20:14:12.068Z | Solon Thomas | ACESSO_NEGADO | Gabrieli Botam | 127.0.0.1
+15 | 2026-11-09T20:14:12.059Z | Nathan Souza | ACESSO_NEGADO | X | 127.0.0.1
+14 | 2026-11-09T20:14:11.939Z | Colaborador A (teste) | ACESSO_NEGADO | Colaborador B (teste) | 127.0.0.1
+13 | 2026-11-09T20:14:11.930Z | Colaborador A (teste) | ACESSO_NEGADO | Colaborador B (teste) | 127.0.0.1
+12 | 2026-11-09T20:14:11.836Z | Colaborador A (teste) | CRIACAO_AGENDAMENTO | Matheus Beraldo | 127.0.0.1
+11 | 2026-11-09T20:14:11.828Z | Gabrieli Botam | CRIACAO_AGENDAMENTO | Jaiane Americo | 127.0.0.1
+

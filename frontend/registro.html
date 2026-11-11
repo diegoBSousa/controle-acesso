@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registros</title>
+
+  
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <script>
+    (function guardPrivado() {
+      if (!localStorage.getItem('token')) {
+        window.location.replace('/login.html');
+        return;
+      }
+      window.addEventListener('pageshow', function (e) {
+        if (e.persisted && !localStorage.getItem('token')) {
+          window.location.replace('/login.html');
+        }
+      });
+      window.addEventListener('popstate', function () {
+        if (!localStorage.getItem('token')) {
+          window.location.replace('/login.html');
+        }
+      });
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/tabela.css" />
+
+  <style>
+    
+    .top-bar #filtroRegistros{
+      width: clamp(260px, 34ch, 520px);
+      max-width: 70vw;
+    }
+    @media (max-width: 780px){
+      .top-bar #filtroRegistros{ width: clamp(220px, 28ch, 70vw); }
+      .download-btn { margin-top: 8px; }
+    }
+    .download-btn{
+      background:#2fb061; color:#0f1b13; border:none;
+      padding:10px 14px; border-radius:8px; font-weight:700;
+      cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,.25);
+      margin-left:8px; display:inline-flex; align-items:center; gap:8px;
+    }
+    .download-btn:hover{ filter:brightness(1.05) }
+    .download-btn svg{ width:18px; height:18px }
+
+    
+    html, body { height: 100%; }
+    body { display:flex; flex-direction:column; }
+
+    main.container{
+      flex:1;
+      width:100vw;
+      max-width:100vw !important;
+      margin:0;
+      padding:16px;
+      box-sizing:border-box;
+    }
+
+    main.container table{
+      width:100%;
+      min-width:100%;
+      border-collapse:collapse;
+      table-layout:auto;
+    }
+
+    main.container th, main.container td{ padding:14px 16px; }
+
+    th.col-usuario, td.col-usuario { width: 38%; }
+    th.col-acao,    td.col-acao    { width: 12%; text-align:left; }
+    th.col-data,    td.col-data    { width: 26%; }
+    th.col-veiculo, td.col-veiculo { width: 24%; }
+
+    .col-acoes{ width:56px; text-align:center; }
+
+    td.col-usuario, td.col-veiculo{ word-break: break-word; }
+
+    th.col-veiculo { text-align: center; }
+
+    
+    .btn-del{
+      background:transparent; border:none; cursor:pointer; padding:0;
+      display:inline-flex; align-items:center; justify-content:center;
+      color:#dc2626; transition:transform .1s ease, color .1s ease;
+    }
+    .btn-del:hover{ color:#ef4444; transform:scale(1.2) }
+    .btn-del svg{ width:16px; height:16px; stroke:currentColor; stroke-width:2.2 }
+    .btn-del[disabled]{ opacity:.4; cursor:not-allowed }
+    tr.removendo{ opacity:.6 }
+
+    
+    .modal-backdrop{
+      position:fixed; inset:0; background:rgba(0,0,0,.45);
+      display:none; align-items:center; justify-content:center; z-index:9999;
+    }
+    .modal{
+      width:min(560px, 92vw); background:#0f172a; color:#e5e7eb;
+      border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,.5);
+      border:1px solid #1f2937;
+    }
+    .modal header{
+      padding:14px 18px; border-bottom:1px solid #1f2937; font-weight:700;
+    }
+    .modal .body{
+      padding:16px 18px; display:grid; gap:12px;
+      grid-template-columns: 1fr 1fr; align-items:end;
+    }
+    .modal .body .col-full{ grid-column:1 / -1 }
+    .modal label{ display:block; font-size:.95rem; margin-bottom:6px; color:#cbd5e1 }
+    .modal input[type="date"]{
+      width:100%; padding:10px 12px; border-radius:8px; border:1px solid #334155;
+      background:#111827; color:#e5e7eb;
+    }
+    .modal .footer{
+      padding:14px 18px; border-top:1px solid #1f2937; display:flex; gap:10px; justify-content:flex-end;
+    }
+    .btn{
+      border:0; padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:600;
+    }
+    .btn.secondary{ background:#1f2937; color:#e5e7eb }
+    .btn.secondary:hover{ filter:brightness(1.05) }
+    .btn.primary{ background:#2fb061; color:#0f1b13 }
+    .btn.primary:hover{ filter:brightness(1.05) }
+    .form-row{ display:flex; align-items:center; gap:10px }
+    .form-row input[type="checkbox"]{ width:18px; height:18px; accent-color:#2fb061 }
+    .muted{ color:#94a3b8; font-size:.9rem }
+    .modal-backdrop.show{ display:flex }
+    .disabled{ opacity:.6; pointer-events:none }
+
+    
+    .modal{ display:block !important; }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="brand">
+    </div>
+
+    <div class="header-center">
+      <span class="brand__title">Registros de Entrada e Saída</span>
+      <div class="top-bar">
+        <nav>
+          <button onclick="location.href='home.html'">Home</button>
+          <button onclick="location.href='cadastro.html'">Cadastro</button>
+        </nav>
+
+        <input type="text" id="filtroRegistros" placeholder="🔍 Pesquisar usuário, ação, data ou veículo" />
+        <button id="btn-export" class="download-btn" title="Baixar planilha Excel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Baixar relatório
+        </button>
+      </div>
+    </div>
+
+    <button id="btn-logout" class="btn-logout">Sair</button>
+  </header>
+
+  <main class="container">
+    <table>
+      <thead>
+        <tr id="thead-registros">
+          
+          <th class="col-usuario">Usuário</th>
+          <th class="col-acao">Ação</th>
+          <th class="col-data">Data e Hora</th>
+          <th class="col-veiculo">Veículo</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-registros"></tbody>
+    </table>
+  </main>
+
+  
+  <div id="modalFiltro" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloModalFiltro">
+      <header><span id="tituloModalFiltro">Gerar relatório</span></header>
+      <div class="body">
+        <div>
+          <label for="dataDe">De</label>
+          <input type="date" id="dataDe" />
+        </div>
+        <div>
+          <label for="dataAte">Até</label>
+          <input type="date" id="dataAte" />
+        </div>
+        <div class="col-full form-row">
+          <input type="checkbox" id="chkRelatorioCompleto" />
+          <label for="chkRelatorioCompleto" style="margin:0;">Gerar relatório inteiro</label>
+        </div>
+        <div class="col-full muted">Defina um período ou marque “Gerar relatório inteiro”. </div>
+      </div>
+      <div class="footer">
+        <button class="btn secondary" id="btnCancelarModal">Cancelar</button>
+        <button class="btn primary" id="btnGerarModal">Gerar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/config.js"></script>
+
+  <script>
+  const API = (window.API_BASE ?? '');
+
+  function lc(v){ return String(v ?? '').trim().toLowerCase(); }
+  function nkey(s){
+    return String(s||'')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/\s+/g,' ')
+      .trim().toLowerCase();
+  }
+  function clean(v){
+    const s = String(v ?? '').trim();
+    return (s && s.toLowerCase() !== 'null') ? s : '';
+  }
+  function authHeaders() {
+    const t = localStorage.getItem('token');
+    return t ? { Authorization: 'Bearer ' + t } : {};
+  }
+
+  function buildCarObj(src){
+    if (!src) return null;
+    const cand = {
+      placa:  clean(src.placa  ?? src.carro_placa  ?? src.veiculo_placa  ?? src.car_placa  ?? src.placa_carro),
+      modelo: clean(src.modelo ?? src.carro_modelo ?? src.veiculo_modelo ?? src.car_modelo ?? src.modelo_carro),
+      cor:    clean(src.cor    ?? src.carro_cor    ?? src.veiculo_cor    ?? src.car_cor    ?? src.cor_carro),
+    };
+    if (cand.placa || cand.modelo || cand.cor) return cand;
+    if (src.carro && typeof src.carro === 'object') return buildCarObj(src.carro);
+    return null;
+  }
+
+  const NO_CAR_KEY = 'entradas_sem_carro_v1';
+  function getNoCarMap(){ try { return JSON.parse(localStorage.getItem(NO_CAR_KEY) || '{}'); } catch { return {}; } }
+  function isMarkedNoCar(row){
+    const map = getNoCarMap();
+    if (!row) return false;
+    if (row.id != null && map['id:'+String(row.id)]) return true;
+    const d = new Date(row.data_hora);
+    if (!isNaN(d) && row.usuario_id != null){
+      const isoMinute = d.toISOString().slice(0,16); // YYYY-MM-DDTHH:MM
+      if (map['fp:'+String(row.usuario_id)+'|'+isoMinute]) return true;
+    }
+    return false;
+  }
+
+  let usuariosById = null;   // Map<string, info>
+  let usuariosByName = null; // Map<string, info[]>
+
+  async function carregarUsuariosMap() {
+    if (usuariosById && usuariosByName) return { usuariosById, usuariosByName };
+    const resp = await fetch(`${API}/usuarios`, { headers: { ...authHeaders() } });
+    const lista = await resp.json().catch(()=>[]);
+
+    usuariosById = new Map();
+    usuariosByName = new Map();
+
+    (Array.isArray(lista) ? lista : []).forEach(u => {
+      const carro = buildCarObj(u);
+      const possui = !!(u.possui_carro || u.possuiCarro || carro);
+
+      const info = {
+        id:   u.id,
+        idStr: String(u.id ?? ''),
+        nome: u.nome || '',
+        cpf:  String(u.cpf || ''),
+        tipo: String(u.tipo || ''),
+        possui_carro: possui,
+        carro
+      };
+
+      if (info.idStr) usuariosById.set(info.idStr, info);
+
+      const key = nkey(u.nome);
+      if (!usuariosByName.has(key)) usuariosByName.set(key, []);
+      usuariosByName.get(key).push(info);
+    });
+
+    return { usuariosById, usuariosByName };
+  }
+
+  function guessUserInfoFromRecord(rec){
+    const idStr = String(rec.usuario_id ?? rec.usuarioId ?? rec.user_id ?? '');
+    if (idStr && usuariosById?.has(idStr)) return usuariosById.get(idStr);
+    const key = nkey(rec.nome ?? rec.usuario_nome ?? rec.user_name ?? '');
+    const list = key ? usuariosByName?.get(key) : null;
+    if (list && list.length) return list[0];
+    return null;
+  }
+
+  let registrosCache = [];
+
+  async function obterUsuarioLogado() { return true; }
+
+  function veiculoDetalhado(r){
+    const action = lc(r.acao);
+    if (action === 'entrada' && isMarkedNoCar(r)) {
+      return 'Sem carro';
+    }
+    const v = r.carro || {};
+    const placa  = clean(v.placa);
+    const modelo = clean(v.modelo);
+    const cor    = clean(v.cor);
+
+    const hasAny = (placa || modelo || cor);
+    if (!hasAny) return '—';
+
+    const partes = [];
+    if (placa)  partes.push(`Placa: ${placa}`);
+    if (modelo) partes.push(`Modelo: ${modelo}`);
+    if (cor)    partes.push(`Cor: ${cor}`);
+    return partes.join(' — ');
+  }
+
+  function renderTabela(lista) {
+    const tbody = document.getElementById('tabela-registros');
+    tbody.innerHTML = '';
+
+    if (!Array.isArray(lista) || lista.length === 0) {
+      const tr = document.createElement('tr');
+      const colSpan = 4; // Usuário + Ação + Data e Hora + Veículo
+      tr.innerHTML = `<td colspan="${colSpan}" style="text-align:center;">Nenhum registro encontrado</td>`;
+      tbody.appendChild(tr);
+      return;
+    }
+
+    for (const r of lista) {
+      const tr = document.createElement('tr');
+      tr.dataset.registroId = r.id;
+
+      const tdUsuario = document.createElement('td');
+      tdUsuario.className = 'col-usuario';
+      tdUsuario.textContent = r.nome;
+
+      const tdAcao = document.createElement('td');
+      tdAcao.className = 'col-acao ' + (lc(r.acao) === 'entrada' ? 'entrada' : 'saida');
+      tdAcao.textContent = (lc(r.acao) === 'entrada' ? 'Entrada' : 'Saída');
+
+      const tdData = document.createElement('td');
+      tdData.className = 'col-data';
+      tdData.textContent = new Date(r.data_hora).toLocaleString('pt-BR');
+
+      const tdVeiculo = document.createElement('td');
+      tdVeiculo.className = 'col-veiculo';
+      tdVeiculo.textContent = veiculoDetalhado(r);
+
+      tr.appendChild(tdUsuario);
+      tr.appendChild(tdAcao);
+      tr.appendChild(tdData);
+      tr.appendChild(tdVeiculo);
+
+      tbody.appendChild(tr);
+    }
+  }
+
+  async function carregarRegistros() {
+    try {
+      await carregarUsuariosMap();
+      const resp = await fetch(`${API}/registros`, { headers: { ...authHeaders() } });
+      const base = await resp.json().catch(()=>[]);
+
+      let registros = (Array.isArray(base) ? base : []).map(r => {
+        const carFromReg = buildCarObj(r);
+        const info = guessUserInfoFromRecord(r) || {};
+        const carro = carFromReg || info.carro || null;
+        const possuiCarro = (r.possui_carro ?? r.possuiCarro ?? info.possui_carro ?? !!carro) ? true : false;
+        const nome = r.nome ?? r.usuario_nome ?? r.user_name ?? info.nome ?? '';
+
+        return {
+          ...r,
+          nome,
+          cpf:  (r.cpf  ?? info.cpf  ?? ''),
+          tipo: (r.tipo ?? info.tipo ?? ''),
+          carro,
+          possui_carro: !!possuiCarro
+        };
+      });
+
+      registrosCache = registros;
+      aplicarFiltro();
+    } catch (err) {
+      console.error('Erro ao carregar registros', err);
+      const tbody = document.getElementById('tabela-registros');
+      const colSpan = isAdmin ? 5 : 4;
+      tbody.innerHTML = `<tr><td colspan="${colSpan}" style="text-align:center;">Erro ao carregar registros</td></tr>`;
+    }
+  }
+
+  function filtrarLista(base) {
+    const q = (document.getElementById('filtroRegistros').value || '').trim().toLowerCase();
+    if (!q) return base.slice();
+    return base.filter(r => {
+      const nome = String(r.nome || '').toLowerCase();
+      const acao = String(r.acao || '').toLowerCase();
+      const data = new Date(r.data_hora).toLocaleString('pt-BR').toLowerCase();
+      const cpf  = String(r.cpf || '').toLowerCase();
+      const tipo = String(r.tipo || '').toLowerCase();
+      const placa  = String(r.carro?.placa  || '').toLowerCase();
+      const modelo = String(r.carro?.modelo || '').toLowerCase();
+      const cor    = String(r.carro?.cor    || '').toLowerCase();
+
+      const veicStr = veiculoDetalhado(r).toLowerCase();
+
+      return (
+        nome.includes(q) || acao.includes(q) || data.includes(q) ||
+        cpf.includes(q)  || tipo.includes(q) ||
+        placa.includes(q) || modelo.includes(q) || cor.includes(q) ||
+        veicStr.includes(q)
+      );
+    });
+  }
+
+  function aplicarFiltro() { renderTabela(filtrarLista(registrosCache)); }
+  document.getElementById('filtroRegistros').addEventListener('input', aplicarFiltro);
+
+  function filtrarPorPeriodo(lista, deISO, ateISO){
+    if (!deISO && !ateISO) return lista.slice();
+    const inicio = deISO ? new Date(deISO+'T00:00:00') : new Date(-8640000000000000);
+    const fim    = ateISO ? new Date(ateISO+'T23:59:59.999') : new Date(8640000000000000);
+    return lista.filter(r => {
+      const d = new Date(r.data_hora);
+      return d >= inicio && d <= fim;
+    });
+  }
+
+  function resumoPorPessoa(lista){
+    const mapa = {};
+    for (const r of lista){
+      const key = (r.nome || '—') + '|' + (r.cpf || '') + '|' + (r.tipo || '');
+      if (!mapa[key]) {
+        mapa[key] = { 'Nome': r.nome || '—', 'CPF': r.cpf || '', 'Tipo': (r.tipo || '').toString().toUpperCase(), 'Entradas': 0, 'Saídas': 0, 'Total': 0 };
+      }
+      if (lc(r.acao) === 'entrada') mapa[key].Entradas++;
+      else mapa[key].Saídas++;
+      mapa[key].Total++;
+    }
+    return Object.values(mapa).sort((a,b)=> a.Nome.localeCompare(b.Nome,'pt-BR'));
+  }
+
+  function apenasHoje(lista){
+    const now = new Date();
+    const inicio = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0,0,0,0);
+    const fim    = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23,59,59,999);
+    return lista.filter(r => {
+      const d = new Date(r.data_hora);
+      return d >= inicio && d <= fim;
+    });
+  }
+
+  function styleHeader(row){
+    row.eachCell(cell => {
+      cell.font = { bold: true, color: {argb:'FFFFFFFF'} };
+      cell.alignment = { vertical:'middle', horizontal:'center' };
+      cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FF2F6A7C'} };
+      cell.border = {
+        top:{style:'thin', color:{argb:'FF1F2937'}},
+        left:{style:'thin', color:{argb:'FF1F2937'}},
+        bottom:{style:'thin', color:{argb:'FF1F2937'}},
+        right:{style:'thin', color:{argb:'FF1F2937'}},
+      };
+    });
+  }
+  function styleRows(ws, startRow){
+    const zebra = ['FFF3F4F6','FFE5E7EB'];
+    const last = ws.lastRow.number;
+    for (let i=startRow;i<=last;i++){
+      const row = ws.getRow(i);
+      row.eachCell((cell, colNumber) => {
+        cell.alignment = { vertical:'middle', horizontal: (colNumber === 1 ? 'left' : 'center') };
+        cell.border = {
+          top:{style:'hair', color:{argb:'FFCBD5E1'}},
+          left:{style:'hair', color:{argb:'FFCBD5E1'}},
+          bottom:{style:'hair', color:{argb:'FFCBD5E1'}},
+          right:{style:'hair', color:{argb:'FFCBD5E1'}},
+        };
+        cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb: zebra[(i-startRow)%2]} };
+      });
+    }
+  }
+  function setWidths(ws, widths){ widths.forEach((w, i) => ws.getColumn(i+1).width = w); }
+  function downloadBlob(content, filename, type){
+    const blob = new Blob([content], {type});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+  }
+  const veiculoStr = (r) => veiculoDetalhado(r).replace('—', '').trim();
+
+  function exportarRelatorio({deISO=null, ateISO=null, completo=false} = {}){
+    let base = filtrarLista(registrosCache);
+    if (!completo){
+      if (deISO && !ateISO) ateISO = deISO;
+      if (!deISO && ateISO) deISO = ateISO;
+      if (deISO && ateISO && new Date(deISO) > new Date(ateISO)) {
+        alert('Data inicial não pode ser maior que a final.');
+        return;
+      }
+      base = filtrarPorPeriodo(base, deISO, ateISO);
+    }
+    if (!base.length){
+      alert('Nada para exportar com o filtro/período selecionado.');
+      return;
+    }
+    const registrosSheet = base.map(r => ({
+      Usuario: r.nome,
+      CPF: r.cpf || '',
+      Tipo: (r.tipo || '').toString().toUpperCase(),
+      Acao: (lc(r.acao) === 'entrada' ? 'Entrada' : 'Saída'),
+      DataHora: new Date(r.data_hora).toLocaleString('pt-BR'),
+      Veiculo: veiculoStr(r)
+    }));
+    const resumoGeral = resumoPorPessoa(base);
+    const hojeLista   = apenasHoje(base);
+    const pessoasEntraram = new Set();
+    const pessoasSairam   = new Set();
+    const pessoasDist     = new Set();
+    for (const r of hojeLista){
+      const key = (r.usuario_id ?? r.nome ?? '') + '|' + (r.cpf || '');
+      if (lc(r.acao) === 'entrada') pessoasEntraram.add(key);
+      if (lc(r.acao) === 'saida')   pessoasSairam.add(key);
+      pessoasDist.add(key);
+    }
+    const hojeResumoLinhas = [
+      { Metrica: 'Pessoas que entraram (distintas)', Valor: pessoasEntraram.size },
+      { Metrica: 'Pessoas que saíram (distintas)',   Valor: pessoasSairam.size },
+      { Metrica: 'Total de pessoas (distintas no dia)', Valor: pessoasDist.size }
+    ];
+    const stamp = new Date().toISOString().slice(0,10);
+    const sufixo = completo ? 'completo' : `${deISO||'inicio'}_a_${ateISO||'fim'}`;
+    const headers = ['Usuário','CPF','Tipo','Ação','Data e Hora','Veículo'];
+    const quote = value => `"${String(value ?? '').replace(/"/g, '""')}"`;
+    const rows = registrosSheet.map(row => [row.Usuario,row.CPF,row.Tipo,row.Acao,row.DataHora,row.Veiculo]);
+    const csv = '\ufeff' + [headers, ...rows].map(row => row.map(quote).join(';')).join('\r\n');
+    downloadBlob(csv, `registros_${sufixo}_${stamp}.csv`, 'text/csv;charset=utf-8');
+  }
+
+  const $modal = document.getElementById('modalFiltro');
+  const $de = document.getElementById('dataDe');
+  const $ate = document.getElementById('dataAte');
+  const $chk = document.getElementById('chkRelatorioCompleto');
+
+  function openModalFiltro(){
+    const today = new Date().toISOString().slice(0,10);
+    $de.value ||= today;
+    $ate.value ||= today;
+    $chk.checked = false;
+    setInputsEnabled(true);
+    $modal.classList.add('show');
+    $modal.setAttribute('aria-hidden','false');
+  }
+  function closeModalFiltro(){
+    $modal.classList.remove('show');
+    $modal.setAttribute('aria-hidden','true');
+  }
+  function setInputsEnabled(enabled){
+    [$de,$ate].forEach(i => {
+      i.disabled = !enabled;
+      i.classList.toggle('disabled', !enabled);
+    });
+  }
+
+  document.getElementById('btn-export').addEventListener('click', openModalFiltro);
+  document.getElementById('btnCancelarModal').addEventListener('click', closeModalFiltro);
+  $chk.addEventListener('change', (e)=>{ setInputsEnabled(!e.target.checked); });
+  document.getElementById('btnGerarModal').addEventListener('click', ()=>{
+    const completo = $chk.checked;
+    const deISO = $de.value || null;
+    const ateISO = $ate.value || null;
+    closeModalFiltro();
+    exportarRelatorio({ deISO, ateISO, completo });
+  });
+
+  function hardLogout() {
+    try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario_nome');
+      localStorage.removeItem('usuario_tipo');
+      localStorage.removeItem('usuario_id');
+      sessionStorage.clear();
+    } catch(_) {}
+    window.location.replace('/login.html');
+  }
+  document.getElementById('btn-logout').addEventListener('click', hardLogout);
+
+  (async () => {
+    try { history.replaceState({}, document.title, location.href); } catch(_) {}
+    await obterUsuarioLogado();   // define isAdmin e coloca cabeçalho Ações se for o caso
+    await carregarUsuariosMap();  // carrega cache de usuários (com veículos)
+    await carregarRegistros();    // carrega registros e mescla veículos
+  })();
+  </script>
+
+</body>
+</html>

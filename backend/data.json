@@ -1,0 +1,101 @@
+{
+  "usuarios": [
+    {
+      "id": 1,
+      "nome": "Gabrieli Botam",
+      "cpf": "100.000.000-01",
+      "email": "gabrieli@demo.local",
+      "usuario": "admin",
+      "tipo": "admin",
+      "setor": "Administração",
+      "ativo": true,
+      "possui_carro": false,
+      "senha_hash": "91580e747d2c679024964604e4245c82:49db049eecab687302478320a47b8f084066558c552d06afd93994a6d61a01415db5baab7ee978844fcec5a4a509a5534489bbf25df69be4c434c17d0e765454"
+    },
+    {
+      "id": 2,
+      "nome": "Nathan Souza",
+      "cpf": "200.000.000-02",
+      "email": "nathan@demo.local",
+      "usuario": "portaria",
+      "tipo": "portaria",
+      "setor": "Portaria",
+      "ativo": true,
+      "possui_carro": false,
+      "senha_hash": "47d3dc0632dd3379c71d24b93fca20fe:5dc952c6ace78cf308d09801dc74cf29f52220042203984180ba8d8c552570bcabb78646dd26a51481620bfea4c3129211e7fe0f77a8932d6b544c9d37f88c34"
+    },
+    {
+      "id": 3,
+      "nome": "Solon Thomas",
+      "cpf": "300.000.000-03",
+      "email": "solon@demo.local",
+      "usuario": "rh",
+      "tipo": "rh",
+      "setor": "RH",
+      "ativo": true,
+      "possui_carro": false,
+      "senha_hash": "a70618465ca4c72c9add3fa7f695c3da:44582983735b7bba2b426b40172c2a0a5dfef739f6a569ec203a162db5becae3cc59b7b1e62f9204c85546f817f397870d923896bb503558a4968169d951ef85"
+    },
+    {
+      "id": 4,
+      "nome": "Jaiane Americo",
+      "cpf": "400.000.000-04",
+      "email": "jaiane@demo.local",
+      "usuario": "jaiane",
+      "tipo": "visitante",
+      "setor": "Comercial",
+      "ativo": true,
+      "possui_carro": false
+    },
+    {
+      "id": 5,
+      "nome": "Matheus Beraldo",
+      "cpf": "500.000.000-05",
+      "email": "matheus@demo.local",
+      "usuario": "matheus",
+      "tipo": "fornecedor",
+      "empresa": "Empresa Demonstração",
+      "ativo": true,
+      "possui_carro": true,
+      "placa": "ABC1D23",
+      "modelo": "Fiorino",
+      "cor": "Branca"
+    }
+  ],
+  "registros": [],
+  "agendamentos": [],
+  "auditoria": [
+    {
+      "id": 2,
+      "ator_id": 1,
+      "ator_nome": "Gabrieli Botam",
+      "ator_tipo": "admin",
+      "acao": "LOGIN",
+      "alvo_id": 1,
+      "alvo_nome": "Gabrieli Botam",
+      "alvo_tipo": "admin",
+      "detalhes": null,
+      "ip_origem": "127.0.0.1",
+      "quando": "2026-11-10T09:54:05.189Z",
+      "hash_anterior": "2beab8728ce840b1138abf6de3aff903ae6b07344eef21e7bfe3bde13722f9d4",
+      "hash": "08d1017b3c62b1df605501853d1bd038dca13f8526e19d41aec3d3bd79a003d3"
+    },
+    {
+      "id": 1,
+      "ator_id": null,
+      "ator_nome": null,
+      "ator_tipo": null,
+      "acao": "FALHA_LOGIN",
+      "alvo_id": 1,
+      "alvo_nome": "Gabrieli Botam",
+      "alvo_tipo": "admin",
+      "detalhes": "Tentativa com login \"admin\"",
+      "ip_origem": "127.0.0.1",
+      "quando": "2026-11-10T09:53:57.306Z",
+      "hash_anterior": null,
+      "hash": "2beab8728ce840b1138abf6de3aff903ae6b07344eef21e7bfe3bde13722f9d4"
+    }
+  ],
+  "usuarios_excluidos": [],
+  "agendamentos_cancelados": []
+}

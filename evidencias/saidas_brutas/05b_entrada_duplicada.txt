@@ -1,0 +1,11 @@
+$ curl -s -i -X POST http://localhost:3000/registros -H 'Authorization: Bearer $TOKEN_PORTARIA' -H 'Content-Type: application/json' -d '{"usuario_id":6,"acao":"entrada"}'
+HTTP/1.1 409 Conflict
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 60
+ETag: W/"3c-v0L7bZ2JiJSrh6RmISneq3al1yw"
+Date: Mon, 09 Nov 2026 20:14:11 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Já existe uma entrada aberta para este usuário"}

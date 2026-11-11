@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Auditoria de Eventos — Admin</title>
+
+  <script>
+    (function guard() {
+      if (!localStorage.getItem('token')) location.replace('/login.html');
+      window.addEventListener('pageshow', e => {
+        if (e.persisted && !localStorage.getItem('token')) location.replace('/login.html');
+      });
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/tabela.css" />
+  <style>
+    .page{ max-width:1120px; margin:18px auto; padding:0 12px; }
+    .card{ background:#0f172a; color:#e5e7eb; border:1px solid #1f2937; border-radius:12px; padding:14px; box-shadow:0 10px 30px rgba(0,0,0,.25) }
+    .toolbar{ display:flex; gap:12px; flex-wrap:wrap; align-items:end; margin-bottom:12px }
+    .toolbar label{ font-size:.9rem; color:#cbd5e1 }
+    .toolbar input[type="date"], .toolbar input[type="text"], .toolbar input[type="number"]{
+      background:#111827; color:#e5e7eb; border:1px solid #334155; border-radius:8px; padding:10px 12px;
+    }
+    .toolbar .grow{ flex:1; min-width:240px }
+    .btn{ border:0; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700 }
+    .btn.primary{ background:#2fb061; color:#0f1b13 }
+    .btn.ghost{ background:#1f2937; color:#e5e7eb }
+    .btn.danger{ background:#dc2626; color:#fff }
+    table{ width:100% }
+    .acao{ font-weight:700 }
+    .muted{ color:#94a3b8 }
+    .pill{ display:inline-block; padding:2px 8px; border-radius:999px; font-size:.78rem; background:#1f2937; margin-left:6px }
+    .top-actions{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:6px }
+    .meta{ font-size:.86rem; color:#94a3b8 }
+
+    
+    .btn-del{
+      background:transparent; border:none; cursor:pointer; padding:0;
+      display:inline-flex; align-items:center; justify-content:center;
+      color:#dc2626; transition:transform .1s ease, color .1s ease;
+    }
+    .btn-del:hover{ color:#ef4444; transform:scale(1.2); }
+    .btn-del svg{ width:16px; height:16px; stroke:currentColor; stroke-width:2.2; }
+    .col-acoes{ width:56px; text-align:center; }
+    tr.removendo{ opacity:.6 }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+
+    <div class="header-center">
+      <span class="brand__title">Auditoria de Eventos</span>
+      <div class="top-bar">
+        <nav>
+          <button onclick="location.href='gerenciamento.html'">Gerenciamento</button>
+          <button onclick="location.href='home.html'">Home</button>
+        </nav>
+      </div>
+    </div>
+
+    <button id="btn-logout" class="btn-logout">Sair</button>
+  </header>
+
+  <main class="page">
+    <div class="card">
+      <div class="top-actions">
+        <div class="meta" id="metaInfo">—</div>
+        <label class="meta" style="display:flex; align-items:center; gap:8px">
+          <input type="checkbox" id="autoRefresh" />
+          Auto-atualizar (15s)
+        </label>
+      </div>
+
+      <div class="toolbar">
+        <div>
+          <label for="de">De</label><br/>
+          <input type="date" id="de">
+        </div>
+        <div>
+          <label for="ate">Até</label><br/>
+          <input type="date" id="ate">
+        </div>
+        <div class="grow">
+          <label for="q">Pesquisar</label><br/>
+          <input type="text" id="q" placeholder="🔍 ator, alvo, ação...">
+        </div>
+        <div>
+          <label for="limit">Limite</label><br/>
+          <input type="number" id="limit" min="1" max="1000" value="400" style="width:110px">
+        </div>
+        <div>
+          <button class="btn primary" id="btnFiltrar" title="Aplicar filtros">Aplicar</button>
+        </div>
+        <div>
+          <button class="btn ghost" id="btnHoje" title="Ir para hoje">Hoje</button>
+        </div>
+        <div style="margin-left:auto">
+          <span class="muted">Auditoria somente leitura</span>
+        </div>
+      </div>
+
+      <table class="tabela">
+        <thead>
+          <tr>
+              <th style="width:210px">Quando</th>
+            <th style="width:290px">Ator</th>
+            <th>Ação</th>
+            <th style="width:290px">Alvo</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="/config.js"></script>
+  <script>
+    const API = window.API_BASE || '';
+    const token = localStorage.getItem('token');
+    function authHeaders(){ return token ? { Authorization: 'Bearer '+token } : {}; }
+
+    function hardLogout(){
+      try{ localStorage.clear(); sessionStorage.clear(); }catch(_){}
+      location.replace('/login.html');
+    }
+    document.getElementById('btn-logout').addEventListener('click', hardLogout);
+
+    async function ensureAdmin(){
+      const r = await fetch(`${API}/me`, { headers: { ...authHeaders() }});
+      if (!r.ok) return location.replace('/home.html');
+      const me = await r.json();
+      const tipo = String(me?.tipo || '').toLowerCase();
+      if (tipo !== 'admin') location.replace('/home.html');
+      document.getElementById('metaInfo').textContent = `Logado como: ${me?.nome || '-'} (${tipo.toUpperCase()})`;
+    }
+
+    function fmtQuando(iso){
+      try { return new Date(iso).toLocaleString('pt-BR'); } catch(_) { return iso; }
+    }
+    function fmtTipo(t){ return (t||'').toString().toUpperCase(); }
+
+    function acaoHuman(acao){
+      const map = {
+        cadastrar_usuario: 'Cadastrou usuário',
+        atualizar_usuario: 'Atualizou usuário',
+        remover_usuario: 'Removeu usuário',
+        ativar_usuario: 'Ativou usuário',
+        inativar_usuario: 'Inativou usuário',
+        registrar_entrada: 'Registrou ENTRADA',
+        registrar_saida: 'Registrou SAÍDA',
+        remover_registro: 'Removeu registro',
+        criar_agendamento: 'Criou agendamento',
+        remover_agendamento: 'Cancelou agendamento'
+      };
+      return map[acao] || acao;
+    }
+
+    function render(rows){
+      const tbody = document.getElementById('tbody');
+      tbody.innerHTML = '';
+      if (!rows.length){
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center">Nenhum evento encontrado</td></tr>`;
+        return;
+      }
+      rows.forEach(ev=>{
+        const tr = document.createElement('tr');
+        tr.dataset.id = ev.id;
+
+        tr.innerHTML = `
+          <td>${fmtQuando(ev.quando)}</td>
+          <td>${ev.ator_nome || '—'} ${ev.ator_tipo ? `<span class="pill">${fmtTipo(ev.ator_tipo)}</span>`:''}</td>
+          <td class="acao">${acaoHuman(ev.acao)}</td>
+          <td>${ev.alvo_nome || '—'} ${ev.alvo_tipo ? `<span class="pill">${fmtTipo(ev.alvo_tipo)}</span>`:''}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function carregar(){
+      const de   = document.getElementById('de').value;
+      const ate  = document.getElementById('ate').value;
+      const q    = document.getElementById('q').value.trim();
+      const lim  = document.getElementById('limit').value || '400';
+
+      const p = new URLSearchParams();
+      if (de)  p.set('de', de);
+      if (ate) p.set('ate', ate);
+      if (q)   p.set('q', q);
+      p.set('limit', lim);
+
+      const r = await fetch(`${API}/auditoria?`+p.toString(), { headers: { ...authHeaders() }});
+      if (r.status === 403) { alert('Apenas admin.'); return; }
+      if (!r.ok) { alert('Erro ao carregar auditoria.'); return; }
+
+      const data = await r.json();
+      render(data);
+    }
+
+    document.getElementById('btnFiltrar').addEventListener('click', carregar);
+    document.getElementById('btnHoje').addEventListener('click', ()=>{
+      const today = new Date().toISOString().slice(0,10);
+      document.getElementById('de').value  = today;
+      document.getElementById('ate').value = today;
+      carregar();
+    });
+
+    let timer = null;
+    document.getElementById('autoRefresh').addEventListener('change', (e)=>{
+      if (e.target.checked){
+        timer = setInterval(carregar, 15000);
+      } else if (timer){
+        clearInterval(timer); timer = null;
+      }
+    });
+
+    document.getElementById('q').addEventListener('keydown', e=>{
+      if (e.key === 'Enter') carregar();
+    });
+
+    (async ()=>{
+      await ensureAdmin();
+      const today = new Date().toISOString().slice(0,10);
+      document.getElementById('de').value  = today;
+      document.getElementById('ate').value = today;
+      await carregar();
+    })();
+  </script>
+</body>
+</html>

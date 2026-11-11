@@ -1,0 +1,10 @@
+{
+  "name": "controle-acesso-backend",
+  "version": "1.1.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "test": "node ../testes/executar_testes.js"
+  },
+  "dependencies": { "express": "^5.1.0", "multer": "^2.0.2" }
+}

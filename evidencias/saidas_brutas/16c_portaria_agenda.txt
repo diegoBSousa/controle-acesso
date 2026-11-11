@@ -1,0 +1,11 @@
+$ curl -s -i -X POST http://localhost:3000/agendar -H 'Authorization: Bearer $TOKEN_PORTARIA' -H 'Content-Type: application/json' -d '{"usuario_id":4,"data_agendada":"2026-11-12","hora_agendada":"08:00","destino":"x"}'
+HTTP/1.1 403 Forbidden
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 56
+ETag: W/"38-rRfU9oKjoQ7rjVdPmARKe/vu+Lo"
+Date: Mon, 09 Nov 2026 20:14:12 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Usuário sem permissão para esta operação"}

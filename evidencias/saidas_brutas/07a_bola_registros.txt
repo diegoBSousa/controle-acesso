@@ -1,0 +1,11 @@
+$ curl -s -i 'http://localhost:3000/registros?usuario_id=7' -H 'Authorization: Bearer $TOKEN_COLAB_A'
+HTTP/1.1 403 Forbidden
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 63
+ETag: W/"3f-sjUhF5RM0Gj/3eCR/ciFcGkEE/4"
+Date: Mon, 09 Nov 2026 20:14:11 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Sem permissão para acessar dados de outro usuário"}

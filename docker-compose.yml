@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    ports:
+      - "127.0.0.1:3000:3000"      # exposto apenas na máquina local
+    environment:
+      DEMO_PASSWORD: ${DEMO_PASSWORD:-123456}
+      AUDIT_KEY: ${AUDIT_KEY:-}     # defina para usar HMAC-SHA256 no encadeamento da auditoria
+      SESSION_TTL_MIN: ${SESSION_TTL_MIN:-30}
+    volumes:
+      - dados:/data                  # persiste data.json fora da imagem
+volumes:
+  dados: {}
