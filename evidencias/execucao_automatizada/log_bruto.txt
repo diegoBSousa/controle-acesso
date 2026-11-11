@@ -21,7 +21,11 @@ $ POST /login   [login visit_t]
 $ POST /login   [login forn_t]
   -> HTTP 200  {"token":"<oculto>","usuario":{"nome":"Fornecedor com credencial","cpf":"555.555.555-55","email":"f@teste.local","usuario":"forn_t","tipo":"fornecedor","setor":null,"empresa":null,"ativo":true,"possui_carro":false,"placa":null,"modelo":null,"cor":null,"id":9,"
 $ POST /registros   [preparação]
+<<<<<<< HEAD
   -> HTTP 201  {"id":1,"usuario_id":6,"nome":"Colaborador A (teste)","cpf":"111.111.111-11","tipo":"colaborador","acao":"entrada","data_hora":"2026-11-11T00:12:53.798Z","registrado_por":2,"registrado_por_nome":"Nathan Souza"}
+=======
+  -> HTTP 201  {"id":1,"usuario_id":6,"nome":"Colaborador A (teste)","cpf":"111.111.111-11","tipo":"colaborador","acao":"entrada","data_hora":"2026-11-10T09:54:19.877Z","registrado_por":2,"registrado_por_nome":"Nathan Souza"}
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
 $ POST /agendar   [preparação]
   -> HTTP 201  {"success":true,"message":"Agendamento criado com sucesso","id":1,"usuario_id":4,"nome":"Jaiane Americo","responsavel_id":1,"responsavel_nome":"Gabrieli Botam","data_agendada":"2026-11-12","hora_agendada":"09:00","destino":"Reunião"}
 $ POST /agendar   [preparação]
@@ -37,7 +41,11 @@ $ GET /usuarios
 $ POST /login   [senha incorreta]
   -> HTTP 401  {"error":"Usuário ou senha inválidos"}
 $ GET /auditoria?acao=FALHA_LOGIN
+<<<<<<< HEAD
   -> HTTP 200  [{"id":17,"ator_id":null,"ator_nome":null,"ator_tipo":null,"acao":"FALHA_LOGIN","alvo_id":1,"alvo_nome":"Gabrieli Botam","alvo_tipo":"admin","detalhes":"Tentativa com login \"admin\"","ip_origem":"127.0.0.1","quando":"2026-11-11T00:12:53.842Z","hash_anterior":
+=======
+  -> HTTP 200  [{"id":17,"ator_id":null,"ator_nome":null,"ator_tipo":null,"acao":"FALHA_LOGIN","alvo_id":1,"alvo_nome":"Gabrieli Botam","alvo_tipo":"admin","detalhes":"Tentativa com login \"admin\"","ip_origem":"127.0.0.1","quando":"2026-11-10T09:54:19.914Z","hash_anterior":
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    OK   T02 Login com senha incorreta | esperado: HTTP 401 + evento FALHA_LOGIN | obtido: HTTP 401; 1 evento(s) FALHA_LOGIN
 
 $ POST /login   [login colab_b]
@@ -117,7 +125,11 @@ $ GET /usuarios
    OK   T20 Fornecedor lista usuários | esperado: HTTP 200, somente o próprio cadastro | obtido: HTTP 200; 1 item(ns)
 
 $ POST /registros
+<<<<<<< HEAD
   -> HTTP 201  {"id":2,"usuario_id":7,"nome":"Colaborador B (teste)","cpf":"222.222.222-22","tipo":"colaborador","acao":"entrada","data_hora":"2026-11-11T00:12:53.923Z","registrado_por":2,"registrado_por_nome":"Nathan Souza"}
+=======
+  -> HTTP 201  {"id":2,"usuario_id":7,"nome":"Colaborador B (teste)","cpf":"222.222.222-22","tipo":"colaborador","acao":"entrada","data_hora":"2026-11-10T09:54:19.964Z","registrado_por":2,"registrado_por_nome":"Nathan Souza"}
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    OK   T21 Entrada válida | esperado: HTTP 201 | obtido: HTTP 201
 
 $ POST /registros
@@ -129,7 +141,11 @@ $ POST /registros
    OK   T23 Saída sem entrada ativa | esperado: HTTP 409 | obtido: HTTP 409
 
 $ POST /registros
+<<<<<<< HEAD
   -> HTTP 201  {"id":3,"usuario_id":7,"nome":"Colaborador B (teste)","cpf":"222.222.222-22","tipo":"colaborador","acao":"saida","data_hora":"2026-11-11T00:12:53.929Z","registrado_por":2,"registrado_por_nome":"Nathan Souza"}
+=======
+  -> HTTP 201  {"id":3,"usuario_id":7,"nome":"Colaborador B (teste)","cpf":"222.222.222-22","tipo":"colaborador","acao":"saida","data_hora":"2026-11-10T09:54:19.965Z","registrado_por":2,"registrado_por_nome":"Nathan Souza"}
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    OK   T24 Saída com entrada ativa | esperado: HTTP 201 | obtido: HTTP 201
 
 $ POST /usuarios
@@ -143,6 +159,7 @@ $ POST /agendar
 $ POST /usuarios   [preparação]
   -> HTTP 201  {"success":true,"message":"Usuário cadastrado com sucesso","userId":10}
 $ POST /registros   [preparação]
+<<<<<<< HEAD
   -> HTTP 201  {"id":4,"usuario_id":10,"nome":"Temporário","cpf":"888.888.888-88","tipo":"visitante","acao":"entrada","data_hora":"2026-11-11T00:12:53.937Z","registrado_por":2,"registrado_por_nome":"Nathan Souza"}
 $ POST /registros   [preparação]
   -> HTTP 201  {"id":5,"usuario_id":10,"nome":"Temporário","cpf":"888.888.888-88","tipo":"visitante","acao":"saida","data_hora":"2026-11-11T00:12:53.941Z","registrado_por":2,"registrado_por_nome":"Nathan Souza"}
@@ -150,6 +167,15 @@ $ DELETE /usuarios/10
   -> HTTP 200  {"success":true,"message":"Usuário excluído (arquivado); histórico preservado"}
 $ GET /registros?usuario_id=10
   -> HTTP 200  [{"id":5,"usuario_id":10,"nome":"Temporário","cpf":"888.888.888-88","tipo":"visitante","acao":"saida","data_hora":"2026-11-11T00:12:53.941Z","registrado_por":2,"registrado_por_nome":"Nathan Souza"},{"id":4,"usuario_id":10,"nome":"Temporário","cpf":"888.888.888
+=======
+  -> HTTP 201  {"id":4,"usuario_id":10,"nome":"Temporário","cpf":"888.888.888-88","tipo":"visitante","acao":"entrada","data_hora":"2026-11-10T09:54:19.968Z","registrado_por":2,"registrado_por_nome":"Nathan Souza"}
+$ POST /registros   [preparação]
+  -> HTTP 201  {"id":5,"usuario_id":10,"nome":"Temporário","cpf":"888.888.888-88","tipo":"visitante","acao":"saida","data_hora":"2026-11-10T09:54:19.969Z","registrado_por":2,"registrado_por_nome":"Nathan Souza"}
+$ DELETE /usuarios/10
+  -> HTTP 200  {"success":true,"message":"Usuário excluído (arquivado); histórico preservado"}
+$ GET /registros?usuario_id=10
+  -> HTTP 200  [{"id":5,"usuario_id":10,"nome":"Temporário","cpf":"888.888.888-88","tipo":"visitante","acao":"saida","data_hora":"2026-11-10T09:54:19.969Z","registrado_por":2,"registrado_por_nome":"Nathan Souza"},{"id":4,"usuario_id":10,"nome":"Temporário","cpf":"888.888.888
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
 $ GET /auditoria?acao=EXCLUSAO_USUARIO
   -> HTTP 200  [{"id":38,"ator_id":1,"ator_nome":"Gabrieli Botam","ator_tipo":"admin","acao":"EXCLUSAO_USUARIO","alvo_id":10,"alvo_nome":"Temporário","alvo_tipo":"visitante","detalhes":"Cadastro arquivado (exclusão lógica); históricos de acesso e agendamentos foram preservad
    OK   T27 Exclusão lógica de usuário preserva histórico | esperado: HTTP 200; cadastro arquivado (sem credencial); registros e auditoria mantidos | obtido: HTTP 200; 2 registro(s) mantido(s); 1 evento(s) EXCLUSAO_USUARIO; arquivado: true; sem senha_hash: true
@@ -159,7 +185,11 @@ $ DELETE /agendamentos/2
    OK   T28 Cancelamento de agendamento é arquivado | esperado: HTTP 200; cancelamento arquivado | obtido: HTTP 200; arquivado: true
 
 $ GET /auditoria
+<<<<<<< HEAD
   -> HTTP 200  [{"id":39,"ator_id":1,"ator_nome":"Gabrieli Botam","ator_tipo":"admin","acao":"EXCLUSAO_AGENDAMENTO","alvo_id":8,"alvo_nome":"Visitante com credencial","alvo_tipo":"visitante","detalhes":"Agendamento 2 cancelado.","ip_origem":"127.0.0.1","quando":"2026-11-11T0
+=======
+  -> HTTP 200  [{"id":39,"ator_id":1,"ator_nome":"Gabrieli Botam","ator_tipo":"admin","acao":"EXCLUSAO_AGENDAMENTO","alvo_id":8,"alvo_nome":"Visitante com credencial","alvo_tipo":"visitante","detalhes":"Agendamento 2 cancelado.","ip_origem":"127.0.0.1","quando":"2026-11-10T0
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    OK   T29 Consulta da trilha de auditoria | esperado: HTTP 200; eventos com ator, IP e hash | obtido: HTTP 200; 39 evento(s); todos com ip_origem e hash: true
 
 $ GET /auditoria?acao=ACESSO_NEGADO
@@ -195,7 +225,11 @@ $ POST /auditoria
    OK   T37 POST na trilha de auditoria | esperado: HTTP 404 (sem rota) | obtido: HTTP 404
 
 $ GET /auditoria/verificar
+<<<<<<< HEAD
   -> HTTP 200  {"integra":true,"total":40,"ultimo_hash":"6d53981db9d5bd70379c7dc6e30b7300923e1241d5dbd470dfeb42528bead454","algoritmo":"SHA-256"}
+=======
+  -> HTTP 200  {"integra":true,"total":40,"ultimo_hash":"45476f935744ce02098f55f2bdc96abd116c16a1eb3dc961ea8293bc52f942e4","algoritmo":"SHA-256"}
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    OK   T38 Verificação da cadeia de hashes (log íntegro) | esperado: integra = true | obtido: HTTP 200; integra = true; 40 eventos; SHA-256
 
 $ GET /auditoria/verificar
@@ -219,7 +253,11 @@ $ POST /login   [tentativa 5]
 $ POST /login   [senha CORRETA após 5 falhas]
   -> HTTP 429  {"error":"Muitas tentativas de login. Tente novamente mais tarde."}
 $ GET /auditoria?acao=LOGIN_BLOQUEADO
+<<<<<<< HEAD
   -> HTTP 200  [{"id":48,"ator_id":null,"ator_nome":null,"ator_tipo":null,"acao":"LOGIN_BLOQUEADO","alvo_id":3,"alvo_nome":"Solon Thomas","alvo_tipo":"rh","detalhes":"Excesso de tentativas com login \"rh\"","ip_origem":"127.0.0.1","quando":"2026-11-11T00:12:54.186Z","hash_an
+=======
+  -> HTTP 200  [{"id":48,"ator_id":null,"ator_nome":null,"ator_tipo":null,"acao":"LOGIN_BLOQUEADO","alvo_id":3,"alvo_nome":"Solon Thomas","alvo_tipo":"rh","detalhes":"Excesso de tentativas com login \"rh\"","ip_origem":"127.0.0.1","quando":"2026-11-10T09:54:20.147Z","hash_an
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    OK   T41 Bloqueio após 5 falhas de login consecutivas | esperado: 5×HTTP 401, depois HTTP 429 + Retry-After + evento LOGIN_BLOQUEADO | obtido: 401,401,401,401,401, depois HTTP 429; Retry-After: 900; 1 evento(s) LOGIN_BLOQUEADO
 
 $ POST /login   [login admin]
@@ -237,13 +275,21 @@ $ GET /auditoria/verificar   [Evento de auditoria removido do meio da trilha]
 $ POST /login   [login admin]
   -> HTTP 200  {"token":"<oculto>","usuario":{"id":1,"nome":"Gabrieli Botam","cpf":"100.000.000-01","email":"gabrieli@demo.local","usuario":"admin","tipo":"admin","setor":"Administração","ativo":true,"possui_carro":false,"foto_base64":null,"carro":null}}
 $ GET /auditoria/verificar   [LIMITAÇÃO: remoção apenas do evento mais recente]
+<<<<<<< HEAD
   -> HTTP 200  {"integra":true,"total":48,"ultimo_hash":"9cef7c66ef0266882c548347d6308539979ec1bba966462050b2f4ef682cdca7","algoritmo":"SHA-256"}
+=======
+  -> HTTP 200  {"integra":true,"total":48,"ultimo_hash":"634f4f30289d0385a54cb70ef4155f29b6d034eac973b13ab4cbb8f56197760c","algoritmo":"SHA-256"}
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    OK   T44 LIMITAÇÃO: remoção apenas do evento mais recente | esperado: não detectada (sem âncora externa do último hash) | obtido: integra = true (truncar o fim da cadeia não é detectável sem guardar o último hash fora do servidor)
 
 $ POST /login   [login admin]
   -> HTTP 200  {"token":"<oculto>","usuario":{"id":1,"nome":"Gabrieli Botam","cpf":"100.000.000-01","email":"gabrieli@demo.local","usuario":"admin","tipo":"admin","setor":"Administração","ativo":true,"possui_carro":false,"foto_base64":null,"carro":null}}
 $ GET /auditoria/verificar   [LIMITAÇÃO: cadeia reescrita sem AUDIT_KEY]
+<<<<<<< HEAD
   -> HTTP 200  {"integra":true,"total":49,"ultimo_hash":"8c7b85585ca1cd491ea041d7bfdcbc1152b55bf1a35f136166e8fbe4b4c8cac3","algoritmo":"SHA-256"}
+=======
+  -> HTTP 200  {"integra":true,"total":49,"ultimo_hash":"28a7022fe42276310932816a351a5273a909416cabd4443a5c27fbfbd3fc2a9b","algoritmo":"SHA-256"}
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    OK   T45 LIMITAÇÃO: cadeia reescrita sem AUDIT_KEY | esperado: não detectada (SHA-256 puro pode ser recalculado por quem tem o arquivo) | obtido: integra = true (sem chave secreta, a cadeia pode ser refeita)
 
 $ POST /login   [login admin]
@@ -251,7 +297,11 @@ $ POST /login   [login admin]
 $ POST /login   [gerar eventos]
   -> HTTP 401  {"error":"Usuário ou senha inválidos"}
 $ GET /auditoria/verificar   [cadeia íntegra com chave]
+<<<<<<< HEAD
   -> HTTP 200  {"integra":true,"total":2,"ultimo_hash":"31aa140741b24a7877740ec37f87896e7ca3433af7e7f6c53910bb9a3e7de259","algoritmo":"HMAC-SHA256"}
+=======
+  -> HTTP 200  {"integra":true,"total":2,"ultimo_hash":"068219594fd241194b2ee604931a183fe5e54657734306c5cab5207053452d83","algoritmo":"HMAC-SHA256"}
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
 $ POST /login   [login admin]
   -> HTTP 200  {"token":"<oculto>","usuario":{"id":1,"nome":"Gabrieli Botam","cpf":"100.000.000-01","email":"gabrieli@demo.local","usuario":"admin","tipo":"admin","setor":"Administração","ativo":true,"possui_carro":false,"foto_base64":null,"carro":null}}
 $ GET /auditoria/verificar   [Cadeia reescrita sem conhecer a AUDIT_KEY (HMAC)]
@@ -266,6 +316,10 @@ $ GET /me   [após expirar (TTL ≈ 1,2 s)]
   -> HTTP 401  {"error":"Não autenticado"}
    OK   T47 Expiração de sessão por inatividade | esperado: HTTP 200 e depois HTTP 401 | obtido: HTTP 200 e depois 401
 
+<<<<<<< HEAD
 $ GET https://127.0.0.1:3108/health (certificado autoassinado)
   -> HTTP 200  Strict-Transport-Security: max-age=31536000
    OK   T48 Servidor sob TLS (certificado autoassinado) | esperado: HTTP 200 via HTTPS + cabeçalho HSTS; HTTP simples não atendido | obtido: HTTP 200; HSTS: max-age=31536000; HTTP simples: conexão recusada/encerrada
+=======
+(teste de TLS ignorado: spawnSync openssl ENOENT)
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be

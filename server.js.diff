@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
 --- a/backend/server.js
 +++ b/backend/server.js
 @@ -6,13 +6,21 @@
@@ -100,6 +104,14 @@
  }
  
 @@ -92,37 +148,92 @@
+<<<<<<< HEAD
+=======
+=======
+--- server.original.js	2026-11-09 17:13:45.250682476 -0300
++++ proj/Controle-acesso-final/backend/server.js	2026-11-09 17:13:45.283300467 -0300
+@@ -92,25 +92,62 @@
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    return (req, res, next) => {
      if (!req.user) return res.status(401).json({ error: 'Não autenticado' });
      if (!allowed.has(String(req.user.tipo).toLowerCase())) {
@@ -114,7 +126,14 @@
 -function audit(req, acao, alvo, detalhes) {
 -  const actor = req.user || req.actor || currentUser(req);
 -  if (!actor) return;
+<<<<<<< HEAD
 -  data.auditoria.unshift({
+=======
+<<<<<<< HEAD
+-  data.auditoria.unshift({
+=======
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
 +// Perfis com visão operacional completa (Tabela 2). Os demais enxergam apenas os próprios dados.
 +const PRIVILEGED_ROLES = new Set(['admin', 'rh', 'portaria']);
 +const roleOf = user => String(user?.tipo || '').toLowerCase();
@@ -151,8 +170,18 @@
 +function audit(req, acao, alvo, detalhes, actorOverride = null) {
 +  const actor = actorOverride || req.user || req.actor || currentUser(req);
 +  // Sem ator identificado só registramos falhas de autenticação (ator desconhecido).
+<<<<<<< HEAD
 +  if (!actor && !['FALHA_LOGIN', 'LOGIN_BLOQUEADO'].includes(acao)) return;
 +  const evento = {
+=======
+<<<<<<< HEAD
++  if (!actor && !['FALHA_LOGIN', 'LOGIN_BLOQUEADO'].includes(acao)) return;
++  const evento = {
+=======
++  if (!actor && acao !== 'FALHA_LOGIN') return;
+   data.auditoria.unshift({
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
      id: nextId(data.auditoria),
 -    ator_id: actor.id,
 -    ator_nome: actor.nome,
@@ -165,6 +194,10 @@
      alvo_nome: alvo?.nome || null,
      alvo_tipo: alvo?.tipo || null,
      detalhes: detalhes || null,
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
 -    quando: new Date().toISOString()
 -  });
 +    ip_origem: clientIp(req),
@@ -217,22 +250,55 @@
 +
    if (!user || user.ativo === false || !user.senha_hash || !verifyPassword(password, user.senha_hash)) {
 +    loginFails.set(chave, [...(loginFails.get(chave) || []), Date.now()]);
+<<<<<<< HEAD
+=======
+=======
++    ip_origem: clientIp(req),
+     quando: new Date().toISOString()
+   });
+ }
+@@ -132,12 +169,15 @@
+   );
+ 
+   if (!user || user.ativo === false || !user.senha_hash || !verifyPassword(password, user.senha_hash)) {
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
 +    audit(req, 'FALHA_LOGIN', user ? { id: user.id, nome: user.nome, tipo: user.tipo } : null,
 +      `Tentativa com login "${login.slice(0, 60)}"`);
 +    saveData();
      return res.status(401).json({ error: 'Usuário ou senha inválidos' });
    }
  
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
 +  loginFails.delete(chave);
    const token = crypto.randomBytes(32).toString('hex');
 -  sessions.set(token, user.id);
 -  audit({ actor: user }, 'LOGIN', user);
 +  sessions.set(token, { userId: user.id, expiraEm: Date.now() + SESSION_TTL_MS });
+<<<<<<< HEAD
+=======
+=======
+   const token = crypto.randomBytes(32).toString('hex');
+   sessions.set(token, user.id);
+-  audit({ actor: user }, 'LOGIN', user);
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
 +  audit(req, 'LOGIN', user, null, user);
    saveData();
  
    res.json({ token, usuario: publicUser(user) });
+<<<<<<< HEAD
 @@ -154,10 +280,20 @@
+=======
+<<<<<<< HEAD
+@@ -154,10 +280,20 @@
+=======
+@@ -154,10 +194,20 @@
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
  app.get('/me', requireAuth, (req, res) => res.json(publicUser(req.user)));
  
  app.get('/usuarios', requireAuth, (req, res) => {
@@ -255,7 +321,15 @@
    const today = new Date().toISOString().slice(0, 10);
    res.json(data.agendamentos
      .filter(item => item.data_agendada === today)
+<<<<<<< HEAD
 @@ -165,6 +301,7 @@
+=======
+<<<<<<< HEAD
+@@ -165,6 +301,7 @@
+=======
+@@ -165,6 +215,7 @@
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
  });
  
  app.get('/usuarios/:id', requireAuth, (req, res) => {
@@ -263,6 +337,7 @@
    const user = data.usuarios.find(item => item.id === Number(req.params.id));
    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
    res.json(publicUser(user));
+<<<<<<< HEAD
 @@ -178,7 +315,7 @@
      nome: body.nome ?? existing.nome,
      cpf: body.cpf ?? existing.cpf,
@@ -306,6 +381,13 @@
  
  app.post('/usuarios', requireAuth, requireRole('admin', 'rh', 'portaria'), upload.single('foto'), (req, res) => {
 @@ -209,11 +359,13 @@
+=======
+<<<<<<< HEAD
+@@ -209,6 +346,7 @@
+=======
+@@ -209,6 +260,7 @@
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    }
  
    const tipo = String(req.body.tipo || 'visitante').toLowerCase();
@@ -313,6 +395,7 @@
    if (INTERNAL_ROLES.has(tipo) && !req.body.senha) {
      return res.status(400).json({ error: 'Senha obrigatória para usuários internos' });
    }
+<<<<<<< HEAD
  
    const user = { ...userFromBody(req.body), id: nextId(data.usuarios) };
 +  if (!req.body.usuario) user.usuario = uniqueUsername(user.usuario);
@@ -320,6 +403,13 @@
    if (duplicate) return res.status(409).json({ error: 'CPF, e-mail ou usuário já cadastrado' });
  
 @@ -229,6 +381,8 @@
+=======
+<<<<<<< HEAD
+@@ -229,6 +367,8 @@
+=======
+@@ -229,6 +281,8 @@
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    if (index < 0) return res.status(404).json({ error: 'Usuário não encontrado' });
  
    const existing = data.usuarios[index];
@@ -328,7 +418,15 @@
    const user = userFromBody(req.body, existing);
  
    if (!req.body.senha && req.body.manterSenha !== 'true') {
+<<<<<<< HEAD
 @@ -254,6 +408,7 @@
+=======
+<<<<<<< HEAD
+@@ -254,6 +394,7 @@
+=======
+@@ -254,6 +308,7 @@
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
  app.put('/usuarios/:id/toggle-ativo', requireAuth, requireRole('admin', 'rh'), (req, res) => {
    const user = data.usuarios.find(item => item.id === Number(req.params.id));
    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
@@ -336,13 +434,25 @@
    user.ativo = !user.ativo;
    audit(req, user.ativo ? 'ATIVACAO_USUARIO' : 'DESATIVACAO_USUARIO', user);
    saveData();
+<<<<<<< HEAD
 @@ -264,15 +419,25 @@
+=======
+<<<<<<< HEAD
+@@ -264,15 +405,25 @@
+=======
+@@ -264,6 +319,7 @@
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    const id = Number(req.params.id);
    const user = data.usuarios.find(item => item.id === id);
    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
 +  if (!canManageType(req.user, user.tipo)) return denyManage(req, res, user);
  
    // O histórico não é apagado: mantém rastreabilidade dos eventos anteriores.
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
 +  // Exclusão lógica: o cadastro sai da lista ativa e é arquivado (sem a credencial).
 +  const { senha_hash, ...arquivado } = user;
 +  data.usuarios_excluidos.push({
@@ -357,6 +467,13 @@
    saveData();
 -  res.json({ success: true, message: 'Usuário excluído; histórico preservado' });
 +  res.json({ success: true, message: 'Usuário excluído (arquivado); histórico preservado' });
+<<<<<<< HEAD
+=======
+=======
+   data.usuarios = data.usuarios.filter(item => item.id !== id);
+@@ -273,6 +329,7 @@
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
  });
  
  app.get(['/carro/:usuarioId', '/veiculo/:usuarioId'], requireAuth, (req, res) => {
@@ -364,7 +481,15 @@
    const user = data.usuarios.find(item => item.id === Number(req.params.usuarioId));
    if (!user?.possui_carro) return res.status(404).json({ message: 'Veículo não encontrado', possui_carro: false });
    res.json({ placa: user.placa, modelo: user.modelo, cor: user.cor, possui_carro: true });
+<<<<<<< HEAD
 @@ -312,17 +477,24 @@
+=======
+<<<<<<< HEAD
+@@ -312,17 +463,24 @@
+=======
+@@ -312,17 +369,24 @@
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    res.status(201).json(record);
  });
  
@@ -392,7 +517,15 @@
    if (req.query.usuario_id) result = result.filter(item => item.usuario_id === Number(req.query.usuario_id));
    if (req.query.limit) result = result.slice(0, Math.min(Number(req.query.limit), 1000));
    res.json(result);
+<<<<<<< HEAD
 @@ -333,7 +505,7 @@
+=======
+<<<<<<< HEAD
+@@ -333,7 +491,7 @@
+=======
+@@ -333,7 +397,7 @@
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    res.status(405).json({ error: 'Registros de acesso são imutáveis para preservar a rastreabilidade' })
  );
  
@@ -401,7 +534,15 @@
    const user = data.usuarios.find(item => item.id === Number(req.body.usuario_id));
    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
    if (!['visitante', 'fornecedor'].includes(String(user.tipo).toLowerCase())) {
+<<<<<<< HEAD
 @@ -360,7 +532,12 @@
+=======
+<<<<<<< HEAD
+@@ -360,7 +518,12 @@
+=======
+@@ -360,7 +424,12 @@
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    res.status(201).json({ success: true, message: 'Agendamento criado com sucesso', ...appointment });
  });
  
@@ -415,7 +556,12 @@
  
  app.delete('/agendamentos/:id', requireAuth, (req, res) => {
    const index = data.agendamentos.findIndex(item => item.id === Number(req.params.id));
+<<<<<<< HEAD
 @@ -372,6 +549,12 @@
+=======
+<<<<<<< HEAD
+@@ -372,6 +535,12 @@
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    if (!canDelete) return res.status(403).json({ error: 'Sem permissão para cancelar este agendamento' });
  
    data.agendamentos.splice(index, 1);
@@ -428,7 +574,11 @@
    audit(req, 'EXCLUSAO_AGENDAMENTO', { id: appointment.usuario_id, nome: appointment.nome, tipo: 'visitante' },
      `Agendamento ${appointment.id} cancelado.`);
    saveData();
+<<<<<<< HEAD
 @@ -392,6 +575,15 @@
+=======
+@@ -392,6 +561,15 @@
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
    res.json(result.slice(0, limit));
  });
  
@@ -444,7 +594,11 @@
  // A auditoria é somente leitura; não há exclusão física de eventos.
  app.delete('/auditoria/:id', requireAuth, requireRole('admin'), (_req, res) =>
    res.status(405).json({ error: 'Eventos de auditoria são imutáveis' })
+<<<<<<< HEAD
 @@ -404,10 +596,19 @@
+=======
+@@ -404,10 +582,19 @@
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
  app.get('/', (_req, res) => res.sendFile(path.join(frontendDir, 'login.html')));
  app.use((_req, res) => res.status(404).json({ error: 'Rota não encontrada' }));
  
@@ -469,3 +623,8 @@
 +if (require.main === module) startServer();
 +
 +module.exports = { app, hashPassword, verifyPassword, verifyAuditChain, startServer };
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be

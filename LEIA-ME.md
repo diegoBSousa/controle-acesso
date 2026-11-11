@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
 # Sistema de Controle de Acessos Seguro e Auditável (PoC do TCC)
 
 ## Como rodar
@@ -63,6 +67,7 @@ O arquivo `server.js.diff` mostra, linha a linha, todas as alterações em rela�
 - O limite de login é por IP+login; não há MFA nem autenticação federada.
 - Senha de demonstração padrão (`123456`) deve ser trocada fora de ambiente de teste.
 - A cobertura de testes abrange as rotas e perfis da matriz; testes de carga ficam como trabalho futuro.
+<<<<<<< HEAD
 
 ## Correções posteriores (revisão do cadastro)
 - **Tela do administrador (`gerenciamento.html`):** o formulário não tinha o campo **e-mail**, mas a API exige nome, CPF e e-mail; por isso todo cadastro falhava com `Preencha nome, CPF e e-mail`. O campo foi adicionado (obrigatório, junto com o CPF), é enviado no cadastro e na edição e é carregado ao editar.
@@ -70,3 +75,32 @@ O arquivo `server.js.diff` mostra, linha a linha, todas as alterações em rela�
 - **`server.js` – logins duplicados:** a verificação de duplicidade tratava campos vazios como iguais (dois cadastros sem login ou sem e-mail davam HTTP 409), e dois e-mails com o mesmo prefixo (`joao@a.com`, `joao@b.com`) davam 409. Agora só campos preenchidos são comparados e, sem login informado, é gerado um login único a partir do e-mail (`joao`, `joao2`).
 - **Conflitos de merge:** foram removidas do `server.js` e deste arquivo as marcas `<<<<<<<`/`=======`/`>>>>>>>` deixadas pelo Git (o servidor não iniciava com elas).
 
+=======
+=======
+# O que mudou no backend (server.js)
+
+Arquivo alterado: `backend/server.js`. O `server.js.diff` mostra linha a linha. O frontend não foi alterado.
+
+## 1. Autorização por objeto (ponto do orientador)
+- `GET /registros`, `/registros/ultimo`, `/registros/abertos`: admin, rh e portaria veem tudo; os demais só o próprio histórico. Pedir `usuario_id` de outra pessoa retorna **403**.
+- `GET /usuarios/:id`, `/carro/:id`, `/veiculo/:id`: só o próprio cadastro (ou admin/rh/portaria).
+- `GET /usuarios`: colaborador recebe o próprio cadastro e a lista mínima (id, nome, tipo) de visitantes e fornecedores, necessária para agendar. Sem CPF, e-mail ou foto de terceiros.
+- `GET /agendamentos`: colaborador vê os agendamentos pelos quais é responsável; visitante/fornecedor, os próprios.
+- `GET /usuarios-agendados-hoje`: restrito a admin, rh e portaria.
+
+## 2. Escalada de privilégio
+- Só admin cria, altera ou exclui contas `admin`; rh gerencia qualquer perfil menos admin; portaria só visitante e fornecedor (POST, PUT, toggle-ativo e DELETE de usuários).
+- `POST /agendar` restrito a admin, rh e colaborador (a tela da portaria já não oferece agendamento).
+
+## 3. Auditoria
+- Novo campo `ip_origem` em todos os eventos.
+- Falhas de login passam a gerar `FALHA_LOGIN` (ator desconhecido, com o login tentado).
+- Negações de acesso (403) passam a gerar `ACESSO_NEGADO`.
+
+## Não mudou (continua como limitação)
+Sessões em memória sem expiração; senha de demonstração `123456`; dados em `data.json`; sem TLS; sem Docker neste zip; log em arquivo JSON alterável por quem acessa o servidor; sem limite de tentativas de login.
+
+## Como rodar
+`cd backend`, `npm install`, `npm start` (porta 3000).
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be

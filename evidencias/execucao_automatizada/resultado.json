@@ -1,10 +1,19 @@
 {
+<<<<<<< HEAD
   "gerado_em": "2026-11-11T00:13:00.358Z",
   "node": "v22.23.4",
   "express": "5.1.0",
   "total": 48,
   "obrigatorios": 46,
   "passaram": 46,
+=======
+  "gerado_em": "2026-11-10T09:54:25.719Z",
+  "node": "v26.13.0",
+  "express": "5.1.0",
+  "total": 47,
+  "obrigatorios": 45,
+  "passaram": 45,
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
   "resultados": [
     {
       "id": "T01",
@@ -522,6 +531,7 @@
       "obtido": "HTTP 200 e depois 401",
       "ok": true,
       "informativo": false
+<<<<<<< HEAD
     },
     {
       "id": "T48",
@@ -533,6 +543,8 @@
       "obtido": "HTTP 200; HSTS: max-age=31536000; HTTP simples: conexão recusada/encerrada",
       "ok": true,
       "informativo": false
+=======
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
     }
   ]
 }

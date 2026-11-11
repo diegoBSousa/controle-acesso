@@ -192,8 +192,18 @@ function clientIp(req) {
 function audit(req, acao, alvo, detalhes, actorOverride = null) {
   const actor = actorOverride || req.user || req.actor || currentUser(req);
   // Sem ator identificado só registramos falhas de autenticação (ator desconhecido).
+<<<<<<< HEAD
   if (!actor && !['FALHA_LOGIN', 'LOGIN_BLOQUEADO'].includes(acao)) return;
   const evento = {
+=======
+<<<<<<< HEAD
+  if (!actor && !['FALHA_LOGIN', 'LOGIN_BLOQUEADO'].includes(acao)) return;
+  const evento = {
+=======
+  if (!actor && acao !== 'FALHA_LOGIN') return;
+  data.auditoria.unshift({
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
     id: nextId(data.auditoria),
     ator_id: actor ? actor.id : null,
     ator_nome: actor ? actor.nome : null,
@@ -204,11 +214,22 @@ function audit(req, acao, alvo, detalhes, actorOverride = null) {
     alvo_tipo: alvo?.tipo || null,
     detalhes: detalhes || null,
     ip_origem: clientIp(req),
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
     quando: new Date().toISOString(),
     hash_anterior: data.auditoria[0]?.hash ?? null
   };
   evento.hash = auditDigest(evento);
   data.auditoria.unshift(evento);
+<<<<<<< HEAD
+=======
+=======
+    quando: new Date().toISOString()
+  });
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
 }
 
 function normalizeAction(value) {
@@ -253,7 +274,14 @@ app.post('/login', (req, res) => {
   }
 
   if (!user || user.ativo === false || !user.senha_hash || !verifyPassword(password, user.senha_hash)) {
+<<<<<<< HEAD
     loginFails.set(chave, [...(loginFails.get(chave) || []), Date.now()]);
+=======
+<<<<<<< HEAD
+    loginFails.set(chave, [...(loginFails.get(chave) || []), Date.now()]);
+=======
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
     audit(req, 'FALHA_LOGIN', user ? { id: user.id, nome: user.nome, tipo: user.tipo } : null,
       `Tentativa com login "${login.slice(0, 60)}"`);
     saveData();
@@ -262,7 +290,15 @@ app.post('/login', (req, res) => {
 
   loginFails.delete(chave);
   const token = crypto.randomBytes(32).toString('hex');
+<<<<<<< HEAD
   sessions.set(token, { userId: user.id, expiraEm: Date.now() + SESSION_TTL_MS });
+=======
+<<<<<<< HEAD
+  sessions.set(token, { userId: user.id, expiraEm: Date.now() + SESSION_TTL_MS });
+=======
+  sessions.set(token, user.id);
+>>>>>>> 668296e80d55ef7cab9b04f4a6e09b1d1597f48d
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
   audit(req, 'LOGIN', user, null, user);
   saveData();
 
@@ -315,7 +351,11 @@ function userFromBody(body, existing = {}) {
     nome: body.nome ?? existing.nome,
     cpf: body.cpf ?? existing.cpf,
     email: body.email ?? existing.email,
+<<<<<<< HEAD
     usuario: body.usuario || existing.usuario || String(body.email || '').split('@')[0],
+=======
+    usuario: body.usuario ?? existing.usuario ?? String(body.email || '').split('@')[0],
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
     tipo,
     setor: body.setor ?? existing.setor ?? null,
     empresa: body.empresa ?? existing.empresa ?? null,
@@ -330,6 +370,7 @@ function userFromBody(body, existing = {}) {
   return result;
 }
 
+<<<<<<< HEAD
 // Compara apenas campos preenchidos: dois cadastros sem e-mail (ou sem login) não são "duplicados".
 function validateUniqueUser(user, ignoreId = null) {
   const digits = value => String(value || '').replace(/\D/g, '');
@@ -351,6 +392,16 @@ function uniqueUsername(base) {
     candidato = `${raiz}${++n}`;
   }
   return candidato;
+=======
+function validateUniqueUser(user, ignoreId = null) {
+  const duplicate = data.usuarios.find(item =>
+    item.id !== ignoreId &&
+    (String(item.cpf || '').replace(/\D/g, '') === String(user.cpf || '').replace(/\D/g, '') ||
+     String(item.email || '').toLowerCase() === String(user.email || '').toLowerCase() ||
+     String(item.usuario || '').toLowerCase() === String(user.usuario || '').toLowerCase())
+  );
+  return duplicate;
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
 }
 
 app.post('/usuarios', requireAuth, requireRole('admin', 'rh', 'portaria'), upload.single('foto'), (req, res) => {
@@ -365,7 +416,10 @@ app.post('/usuarios', requireAuth, requireRole('admin', 'rh', 'portaria'), uploa
   }
 
   const user = { ...userFromBody(req.body), id: nextId(data.usuarios) };
+<<<<<<< HEAD
   if (!req.body.usuario) user.usuario = uniqueUsername(user.usuario);
+=======
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
   const duplicate = validateUniqueUser(user);
   if (duplicate) return res.status(409).json({ error: 'CPF, e-mail ou usuário já cadastrado' });
 

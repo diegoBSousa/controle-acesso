@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -107,3 +108,114 @@
   <script src="/agendamento.js"></script>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agendar Usuário</title>
+  <link rel="stylesheet" href="/agendamento.css" />
+</head>
+<body>
+
+  
+  <header class="app-header">
+    
+    <div class="brand">
+    </div>
+
+    
+    <div class="header-center">
+      <span class="brand__title">Agendamento de Visitas</span>
+
+      <div class="actions">
+        <button id="btn-novo-agendamento">Novo Agendamento</button>
+        <button id="btn-novo-cadastro">Novo Cadastro</button>
+      </div>
+    </div>
+
+    
+    <button id="btn-logout" class="btn-logout">Sair</button>
+  </header>
+
+  
+  <main class="container">
+    <section class="agendamento-box">
+      
+      <div id="formulario-agendar" class="formulario">
+        <form id="agendarForm">
+          
+          <div class="form-group">
+            <label for="usuario_nome" style="color:white;">Nome do Fornecedor ou Visitante:</label>
+            <input
+              type="text"
+              list="usuariosList"
+              id="usuario_nome"
+              name="usuario_nome"
+              placeholder="Digite para buscar..."
+              autocomplete="off"
+              required
+            />
+            <datalist id="usuariosList"></datalist>
+            <input type="hidden" id="usuario_id" name="usuario_id" />
+          </div>
+
+          
+          <div class="form-group">
+            <label for="responsavel" style="color:white;">Responsável:</label>
+            <input type="text" id="responsavel" name="responsavel_nome" readonly />
+            <input type="hidden" id="responsavel_id" name="responsavel_id" />
+          </div>
+
+          
+          <div class="form-group">
+            <label for="data" style="color:white;">Data:</label>
+            <input type="date" id="data" name="data" required />
+          </div>
+
+          
+          <div class="form-group">
+            <label for="destino" style="color:white;">Destino:</label>
+            <input type="text" id="destino" name="destino" required />
+          </div>
+
+          
+          <div class="form-group">
+            <label for="hora" style="color:white;">Hora:</label>
+            <input type="time" id="hora" name="hora" required />
+          </div>
+
+          <button type="submit">Agendar</button>
+        </form>
+        <p id="mensagem"></p>
+      </div>
+
+      
+      <div class="tabela-header">
+        <h3 class="subtitulo">Agendamentos Realizados</h3>
+        <input type="text" id="filtroTabela" placeholder="🔍 Pesquisar usuário..." />
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Visitante/Fornecedor</th>
+            <th>Empresa</th>
+            <th>Responsável</th>
+            <th>Data</th>
+            <th>Hora</th>
+            <th>Destino</th>
+          </tr>
+        </thead>
+        <tbody id="listaAgendamentos"></tbody>
+      </table>
+    </section>
+  </main>
+
+  
+  <script src="/config.js"></script>
+  <script src="/agendamento.js"></script>
+</body>
+</html>
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be

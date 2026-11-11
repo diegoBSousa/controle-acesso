@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -461,3 +462,468 @@
 
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RH • Gerenciamento de Usuários</title>
+
+  <link rel="stylesheet" href="gerenciamento.css" />
+
+  <style>
+    :root{
+      color-scheme: dark;
+      --bg:#2e3440;
+      --card:#3b4252;
+      --muted:#434c5e;
+      --text:#eceff4;
+      --text-2:#bfc7d8;
+      --primary:#4a6fa5;
+      --success:#2fb061;
+      --danger:#a82f23;
+      --btn-w: 220px;
+      --btn-h: 42px;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg); color:var(--text); margin:0;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
+
+    
+    .container{
+      
+      max-width: clamp(1200px, 96vw, 1600px);
+      margin: 28px auto 40px; padding: 0 18px;
+    }
+
+    
+    .page-head{ position:relative; padding:26px 18px; border-radius:16px; background:linear-gradient(180deg,#333a49,#2b3342); border:1px solid rgba(255,255,255,.06); box-shadow:0 18px 45px rgba(0,0,0,.35); margin-bottom:22px; display:flex; align-items:center; justify-content:center; }
+    .title{ margin:0; font-size:clamp(22px,2.4vw,32px); color:#fff; text-align:center; letter-spacing:.2px; }
+    .logout{ position:absolute; top:12px; right:12px; }
+    .logout-btn{ display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); color:#fff; padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:800; font-size:13px; transition:filter .15s ease, transform .05s ease, box-shadow .15s ease; box-shadow:0 10px 24px rgba(0,0,0,.25); }
+    .logout-btn:hover{ filter:brightness(1.05) } .logout-btn:active{ transform:translateY(1px) } .logout-btn:focus{ outline:none; box-shadow:0 0 0 3px rgba(74,111,165,.28); }
+
+    
+    .card{ background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:14px; padding:16px; box-shadow:0 18px 45px rgba(0,0,0,.35); margin-bottom:22px; }
+    .card h2{ margin:0 0 8px; font-size:18px; }
+    .rule{ height:3px; width:100%; background:linear-gradient(90deg,var(--primary),transparent); border-radius:999px; opacity:.6; margin:6px 0 10px; }
+
+    
+    .form-grid{ display:grid; grid-template-columns: repeat(12,1fr); gap:14px 16px; align-items:end; }
+    .col-6{ grid-column: span 6; }
+    .form-group{ display:flex; flex-direction:column; gap:8px; }
+    .label{ font-weight:700; font-size:12px; color:var(--text-2); letter-spacing:.2px; }
+    .control{ background:var(--muted); border:1px solid #475166; color:var(--text); padding:12px 14px; border-radius:10px; font-size:14px; outline:none; height:44px; line-height:44px; transition:box-shadow .15s ease, border-color .15s ease, transform .05s ease, background .2s ease; }
+    .control:focus{ border-color:var(--primary); box-shadow:0 0 0 3px rgba(74,111,165,.28); transform:translateY(-1px); background:#40485b; }
+
+    
+    .form-actions{ display:flex; justify-content:center; align-items:center; gap:12px; margin-top:10px; }
+    .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; width:var(--btn-w) !important; height:var(--btn-h) !important; border:none; border-radius:10px; cursor:pointer; font-weight:900; font-size:14px; transition:filter .15s ease, transform .05s ease, box-shadow .15s ease; box-shadow:0 10px 24px rgba(0,0,0,.25); text-decoration:none; white-space:nowrap; }
+    .btn:hover{ filter:brightness(1.05)} .btn:active{ transform:translateY(1px)}
+    .btn-primary{ background:#31c26a; color:#0f1b13; border:1px solid rgba(0,0,0,.15) }
+    .btn-secondary{ background:#4a6fa5; color:#fff; border:1px solid rgba(0,0,0,.15) }
+    .btn svg{ width:18px; height:18px; }
+
+    
+    .table-responsive{
+      
+      overflow-x: auto;
+      border-radius:10px;
+      width:100%;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      table-layout:fixed; 
+    }
+
+    thead th{
+      text-align:center;
+      font-size:12px;
+      color:var(--text-2);
+      font-weight:800;
+      padding:10px 8px;
+      background:#343b4b;
+    }
+    tbody td{
+      padding:8px 10px;
+      border-top:1px solid rgba(255,255,255,.06);
+      vertical-align:middle;
+      text-align:center;
+      line-height:1.25;
+    }
+    tbody tr:nth-child(odd){ background:rgba(255,255,255,.015); }
+    tbody tr:hover{ background:rgba(255,255,255,.035); }
+
+    
+    .cell-ellipsis{
+      display:block;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    
+    .action-btns{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:nowrap;
+      min-width:150px;
+    }
+    .btn-sm{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 12px;
+      height:32px;
+      font-size:12px;
+      font-weight:700;
+      border-radius:8px;
+      line-height:1;
+      cursor:pointer;
+      border:none;
+    }
+    .btn-edit{ background:#4a6fa5; color:#fff; }
+    .btn-remove{ background:#a82f23; color:#fff; }
+
+    
+    .table-tools{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 0 12px; flex-wrap:wrap; }
+    .search{ flex:1; min-width:260px; display:flex; align-items:center; gap:10px; background:var(--muted); border:1px solid #475166; border-radius:10px; padding:10px 12px; }
+    .search input{ flex:1; border:none; outline:none; background:transparent; color:#fff; font-size:14px; }
+    .stats{ font-size:12px; color:var(--text-2); }
+
+    
+    @media (max-width: 900px){
+      .container{ max-width: 100%; padding: 0 14px; }
+      .col-6{ grid-column: span 12; }
+      .form-actions{ flex-direction:column }
+      .btn{ width:100% !important }
+      thead th:nth-child(2), tbody td:nth-child(2){ display:none } 
+    }
+    @media (max-width: 520px){
+      .action-btns{ flex-wrap:wrap; gap:8px; }
+      .btn-sm{ flex:1 1 120px; }
+    }
+  </style>
+
+  <script src="/config.js"></script>
+  <script>
+    (function guardRH(){
+      try{
+        const tipo = localStorage.getItem('usuario_tipo');
+        const token = localStorage.getItem('token');
+        if (!token || (tipo && tipo.toLowerCase() !== 'rh')) {
+          window.location.replace('/login.html');
+        }
+      }catch(e){ window.location.replace('/login.html'); }
+    })();
+  </script>
+</head>
+<body class="page-rh">
+
+  <div class="container">
+    <header class="page-head">
+      <h1 class="title">Gerenciamento de Usuários</h1>
+      <div class="logout">
+        <button class="logout-btn" onclick="logout()">Sair</button>
+      </div>
+    </header>
+
+    
+    <section class="card">
+      <h2 id="form-title">Cadastrar Novo Usuário</h2>
+      <div class="rule"></div>
+
+      <form id="cadastro-form" novalidate>
+        <input type="hidden" id="usuarioId" />
+
+        <div class="form-grid">
+          <div class="form-group col-6">
+            <label class="label" for="nome">Nome</label>
+            <input class="control" type="text" id="nome" placeholder="Nome completo" required />
+          </div>
+
+          <div class="form-group col-6">
+            <label class="label" for="cpf">CPF</label>
+            <input class="control" type="text" id="cpf" placeholder="000.000.000-00" required />
+          </div>
+
+          <div class="form-group col-6">
+            <label class="label" for="email">Email</label>
+            <input class="control" type="email" id="email" placeholder="nome@empresa.com" required />
+          </div>
+
+          <div class="form-group col-6">
+            <label class="label" for="usuario">Nome de usuário (login)</label>
+            <input class="control" type="text" id="usuario" />
+          </div>
+
+          <div class="form-group col-6">
+            <label class="label" for="setor">Setor</label>
+            <input class="control" type="text" id="setor" placeholder="Ex.: Financeiro, TI, RH" />
+          </div>
+
+          <div class="form-group col-6" id="campo-senha">
+            <label class="label" for="senha">Senha</label>
+            <input class="control" type="password" id="senha" placeholder="••••••••" />
+          </div>
+
+          <div class="form-group col-6">
+            <label class="label" for="tipo">Tipo de usuário</label>
+            <select id="tipo" class="control" onchange="verificarTipoUsuario()">
+              <option value="colaborador">Usuário</option>
+              <option value="portaria">Portaria</option>
+              <option value="rh">RH</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="submit-button">Cadastrar</button>
+          <a class="btn btn-secondary" href="/agendamento.html" id="btn-agendamento">Novo agendamento</a>
+        </div>
+      </form>
+    </section>
+
+    
+    <section class="card">
+      <h2 style="margin:0 0 10px;">Lista de Usuários</h2>
+      <div class="table-tools">
+        <div class="search">
+          <input id="busca" placeholder="Buscar por nome, email, CPF ou setor..." />
+        </div>
+        <div class="stats" id="stats">0 registros</div>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          
+          <colgroup>
+            <col style="width:24%"> 
+            <col style="width:14%"> 
+            <col style="width:30%"> 
+            <col style="width:12%"> 
+            <col style="width:12%">
+            <col style="width:8%">  
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>CPF</th>
+              <th>Email</th>
+              <th>Tipo</th>
+              <th>Setor</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="listaUsuarios"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+<script>
+  
+  window.API_BASE = window.API_BASE || '';
+  const API = window.API_BASE;
+  const api = (p) => `${API}${p}`.replace(/([^:]\/)\/+/g, '$1');
+
+  function authHeaders() {
+    const t = localStorage.getItem('token');
+    return t ? { Authorization: 'Bearer ' + t } : {};
+  }
+  async function readJsonSafe(res) {
+    const txt = await res.text();
+    try { return { data: JSON.parse(txt), raw: txt }; }
+    catch { return { data: null, raw: txt }; }
+  }
+
+  function logout(){
+    localStorage.clear();
+    window.location.href = '/login.html';
+  }
+
+  
+  const form         = document.getElementById('cadastro-form');
+  const formTitle    = document.getElementById('form-title');
+  const submitBtn    = document.getElementById('submit-button');
+
+  const nome         = document.getElementById('nome');
+  const cpf          = document.getElementById('cpf');
+  const email        = document.getElementById('email');
+  const usuarioLogin = document.getElementById('usuario');
+  const setorInput   = document.getElementById('setor');
+  const senha        = document.getElementById('senha');
+  const tipo         = document.getElementById('tipo');
+  const usuarioId    = document.getElementById('usuarioId');
+
+  const buscaInput   = document.getElementById('busca');
+  const statsEl      = document.getElementById('stats');
+
+  let editando = false;
+  let listaCache = [];
+
+  function setModoCadastro(){
+    editando = false;
+    formTitle.textContent = 'Cadastrar Novo Usuário';
+    submitBtn.textContent = 'Cadastrar';
+    senha.value = '';
+    usuarioId.value = '';
+    form.reset();
+  }
+
+  function verificarTipoUsuario(){
+    const v=(tipo.value||'').toLowerCase();
+    const exigeSenha=(v==='colaborador'||v==='portaria'||v==='rh');
+    if(editando){
+      senha.removeAttribute('required'); // não obriga troca na edição
+    }else{
+      exigeSenha ? senha.setAttribute('required','required') : senha.removeAttribute('required');
+    }
+  }
+
+  
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const fd = new FormData();
+    fd.append('nome',   nome.value);
+    fd.append('cpf',    cpf.value);
+    fd.append('email',  email.value);
+    fd.append('usuario',usuarioLogin.value||'');
+    fd.append('setor',  setorInput.value||'');
+    fd.append('tipo',   tipo.value);
+
+    if (senha.value && senha.value !== '********') {
+      fd.append('senha', senha.value);
+    } else if (editando) {
+      fd.append('manterSenha','true');
+    }
+
+    let url = api('/usuarios');
+    let method = 'POST';
+    if (editando && usuarioId.value) {
+      url = api(`/usuarios/${usuarioId.value}`);
+      method = 'PUT';
+    }
+
+    try{
+      const res = await fetch(url, { method, body: fd, headers: { Accept:'application/json', ...authHeaders() } });
+      const { data, raw } = await readJsonSafe(res);
+      if(!res.ok) throw new Error(data?.error || `HTTP ${res.status} - ${raw}`);
+      alert(editando ? '✔ Usuário atualizado com sucesso!' : '✔ Usuário cadastrado com sucesso!');
+      setModoCadastro();
+      carregarUsuarios();
+    }catch(err){
+      console.error('Salvar usuário falhou:', err);
+      alert('Erro ao salvar usuário: ' + err.message);
+    }
+  });
+
+  
+  async function editarUsuario(id){
+    try{
+      const res = await fetch(api(`/usuarios/${id}`), { headers: { Accept:'application/json', ...authHeaders() }});
+      const { data, raw } = await readJsonSafe(res);
+      if(!res.ok) throw new Error(data?.error || `HTTP ${res.status} - ${raw}`);
+
+      const u = data || {};
+      usuarioId.value    = u.id;
+      nome.value         = u.nome        || '';
+      cpf.value          = u.cpf         || '';
+      email.value        = u.email       || '';
+      usuarioLogin.value = u.usuario     || '';
+      setorInput.value   = u.setor       || '';
+      tipo.value         = (u.tipo || 'colaborador').toLowerCase();
+
+      senha.value = '********';
+      editando = true;
+
+      formTitle.textContent = 'Editar Usuário';
+      submitBtn.textContent = 'Salvar alterações';
+      verificarTipoUsuario();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }catch(err){
+      console.error('Erro ao carregar usuário:', err);
+      alert('Falha ao carregar usuário: ' + err.message);
+    }
+  }
+  window.editarUsuario = editarUsuario;
+
+  
+  function labelTipo(t){ t=String(t||'').toLowerCase(); return t==='colaborador' ? 'USUÁRIO' : t.toUpperCase(); }
+
+  function renderTabela(lista){
+    const tbody = document.getElementById('listaUsuarios'); tbody.innerHTML='';
+    lista.forEach(u=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><span class="cell-ellipsis" title="${u.nome ?? ''}">${u.nome ?? ''}</span></td>
+        <td><span class="cell-ellipsis" title="${u.cpf ?? ''}">${u.cpf ?? ''}</span></td>
+        <td><span class="cell-ellipsis" title="${u.email ?? ''}">${u.email ?? ''}</span></td>
+        <td>${labelTipo(u.tipo)}</td>
+        <td><span class="cell-ellipsis" title="${u.setor ?? ''}">${u.setor ?? ''}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="btn-sm btn-edit"   onclick="editarUsuario(${u.id})">Editar</button>
+            <button class="btn-sm btn-remove" onclick="removerUsuario(${u.id})">Remover</button>
+          </div>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+    statsEl.textContent = `${lista.length} registros`;
+  }
+
+  async function carregarUsuarios(){
+    try{
+      const res = await fetch(api('/usuarios'), { headers: { ...authHeaders() }});
+      const { data, raw } = await readJsonSafe(res);
+      if(!res.ok) throw new Error(`HTTP ${res.status} - ${raw}`);
+      listaCache = (data || []).filter(u => !['admin','visitante','fornecedor'].includes(String(u.tipo||'').toLowerCase()));
+      aplicarBusca();
+    }catch(err){
+      console.error('Erro ao carregar usuários:', err);
+    }
+  }
+
+  function aplicarBusca(){
+    const q=(buscaInput.value||'').trim().toLowerCase();
+    const filtrada = !q ? listaCache :
+      listaCache.filter(u=>{
+        const nome=(u.nome||'').toLowerCase();
+        const email=(u.email||'').toLowerCase();
+        const cpf=(u.cpf||'').toLowerCase();
+        const setor=(u.setor||'').toLowerCase();
+        return nome.includes(q)||email.includes(q)||cpf.includes(q)||setor.includes(q);
+      });
+    renderTabela(filtrada);
+  }
+  buscaInput.addEventListener('input', aplicarBusca);
+
+  async function removerUsuario(id){
+    if(!confirm('Deseja realmente remover este usuário?')) return;
+    try{
+      const res = await fetch(api(`/usuarios/${id}?cascade=1`), { method:'DELETE', headers:{ Accept:'application/json', ...authHeaders() }});
+      const { data, raw } = await readJsonSafe(res);
+      if(!res.ok) throw new Error(data?.error || `HTTP ${res.status} - ${raw}`);
+      alert(data?.message || 'Usuário removido com sucesso!');
+      carregarUsuarios();
+    }catch(err){
+      console.error('DELETE falhou:', err);
+      alert('Erro ao excluir usuário: ' + err.message);
+    }
+  }
+  window.removerUsuario = removerUsuario;
+
+  window.onload = () => { setModoCadastro(); carregarUsuarios(); verificarTipoUsuario(); };
+</script>
+
+</body>
+</html>
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be

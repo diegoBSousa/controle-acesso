@@ -1,8 +1,14 @@
 # Resultado da execução automatizada dos testes
 
+<<<<<<< HEAD
 - Data: 2026-11-11T00:13:00.359Z
 - Node.js: v22.23.4 | Express: 5.1.0
 - Cenários obrigatórios: **46 de 46** com o resultado esperado
+=======
+- Data: 2026-11-10T09:54:25.720Z
+- Node.js: v26.13.0 | Express: 5.1.0
+- Cenários obrigatórios: **45 de 45** com o resultado esperado
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
 - Cenários informativos (limitações conhecidas): 2
 
 | ID | Categoria | Cenário | Perfil | Requisição | Esperado | Obtido | Status |
@@ -54,4 +60,7 @@
 | T45 | Auditoria e integridade | LIMITAÇÃO: cadeia reescrita sem AUDIT_KEY | atacante com acesso ao arquivo | `alteração + recálculo SHA-256 da cadeia inteira` | não detectada (SHA-256 puro pode ser recalculado por quem tem o arquivo) | integra = true (sem chave secreta, a cadeia pode ser refeita) | INFO |
 | T46 | Auditoria e integridade | Cadeia reescrita sem conhecer a AUDIT_KEY (HMAC) | atacante com acesso ao arquivo | `alteração + recálculo SHA-256 + GET /auditoria/verificar` | integra = false (HMAC exige a chave, que não está no arquivo) | integra = false; servidor iniciado com AUDIT_KEY; motivo: conteúdo do evento alterado | OK |
 | T47 | Autenticação e sessão | Expiração de sessão por inatividade | admin | `GET /me antes e depois do TTL` | HTTP 200 e depois HTTP 401 | HTTP 200 e depois 401 | OK |
+<<<<<<< HEAD
 | T48 | Transporte | Servidor sob TLS (certificado autoassinado) | anônimo | `GET https://…/health` | HTTP 200 via HTTPS + cabeçalho HSTS; HTTP simples não atendido | HTTP 200; HSTS: max-age=31536000; HTTP simples: conexão recusada/encerrada | OK |
+=======
+>>>>>>> ebe64ce4a18c9e934d028673ea63c9ff1efdd8be
